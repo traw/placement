@@ -7,6 +7,8 @@ release.properties
 #############
 ## Eclipse ##
 #############
+.project
+.classpath
 *.pydevproject
 .metadata
 .gradle
