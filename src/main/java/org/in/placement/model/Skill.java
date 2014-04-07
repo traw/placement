@@ -3,6 +3,15 @@
  */
 package org.in.placement.model;
 
+
+/*
+ CREATE TABLE IF NOT EXIST skill
+ (
+   id bigserial NOT NULL,
+   name varchar(30),
+   PRIMARY KEY(id)
+ );
+*/
 /**
  * @author traw
  *

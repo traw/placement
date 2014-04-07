@@ -6,13 +6,12 @@ package org.in.placement.util;
 import java.beans.PropertyVetoException;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.apache.log4j.Logger;
-
 import com.mchange.v2.c3p0.ComboPooledDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author traw
@@ -49,7 +48,7 @@ public class DataSource {
 
 	private ComboPooledDataSource cpds;
 	private static DataSource datasource;
-	private static Logger log = Logger.getLogger(DataSource.class);
+	private static Logger log = LoggerFactory.getLogger(DataSource.class);
 
 	/**
 	 * @throws PropertyVetoException

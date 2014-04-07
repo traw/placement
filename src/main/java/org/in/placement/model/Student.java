@@ -1,6 +1,22 @@
 package org.in.placement.model;
 
-public class Student {
+
+
+/*
+CREATE TABLE IF NOT EXISTS student
+(
+ id bigserial PRIMARY KEY,
+ name varchar(30) NOT NULL,
+ emailid varchar(30) NOT NULL,
+ password varchar(30) NOT NULL,
+ placed boolean NOT NULL,
+ sscmarks real NOT NULL,
+ hscmarks real NOT NULL,
+ mcamarks real NOT NULL
+);
+* */
+
+ public class Student {
 	private long id = -1l;
 	private String name;
 	private String email;
@@ -22,8 +38,7 @@ public class Student {
 	 * @param id
 	 * @param name
 	 * @param email
-	 * @param passwordz
-	 * @param marks
+	 * @param password
 	 * @param isPlaced
 	 */
 	public Student(long id, String name, String email, String password, boolean isPlaced) {
