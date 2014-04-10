@@ -52,6 +52,7 @@ public class StudentDaoImpl implements StudentDao {
      * (non-Javadoc)
      *
      * @see org.in.placement.dao.StudentDao#getStudentForID(long)
+     * throw PropertyVetoException, SQLException
      */
     @Override
     public Student getStudentForID(long studentID)
@@ -68,7 +69,8 @@ public class StudentDaoImpl implements StudentDao {
                 statement.setLong(1, studentID);
                 try (ResultSet res = statement.executeQuery()) {
                     if (res.next()) {
-                        stud = new Student();
+                        log.error("StudentDaoImpl71");
+                                stud = new Student();
                         stud.setId(res.getLong(STUDENT_ID));
                         stud.setName(res.getString(STUDENT_NAME));
                         stud.setEmail(res.getString(EMAIL_ID));
@@ -78,9 +80,15 @@ public class StudentDaoImpl implements StudentDao {
                         stud.setHscMark(res.getFloat(HSC_MARKS));
                         stud.setMcaMark(res.getFloat(MCA_MARKS));
                     }
+                    log.error("StudentDaoImpl82");
+                } catch (SQLException e) {
+                    log.error("Placement85: " + e.getMessage(), e);
+                    e.printStackTrace();
+                    throw e;
                 }
             } catch (SQLException e) {
-                log.error(e.getMessage(), e);
+                log.error("Placement90: " + e.getMessage(), e);
+                e.printStackTrace();
                 throw e;
             }
         }

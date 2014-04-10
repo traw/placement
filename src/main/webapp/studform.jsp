@@ -1,6 +1,7 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8" %>
-<%
-    String path = request.getContextPath();
+
+
+<% String path = request.getContextPath();
     String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + path + "/";
 %>
 
@@ -11,16 +12,8 @@
     <base href="<%=basePath%>">
 
     <title>Placement</title>
+    <c:import url="inc/meta.jsp"></c:import>
 
-    <meta http-equiv="pragma" content="no-cache">
-    <meta http-equiv="cache-control" content="no-cache">
-    <meta http-equiv="expires" content="0">
-    <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
-    <meta http-equiv="description" content="This is my page">
-    <link rel="stylesheet" type="text/css" href="bootstrap-3.1.1-dist/css/bootstrap.min.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
-    <link href="css/base.css" rel="stylesheet">
 </head>
 <body>
 
@@ -50,15 +43,19 @@
         </div>
         <div class="col-md-9">
             <c:import url="searchstudform.jsp"></c:import>
-            <div id="result"></div>
+            <div id="result" class="hidden"></div>
         </div>
-        <div class="navbar navbar-fixed-bottom">
-            <div class="row">
-                <div class="col-md-12">
-                    <c:import url="inc/footer.jsp"></c:import>
-                </div>
+
+        <div id="footer navbar navbar-fixed-bottom">
+            <div class="container">
+                <c:import url="inc/footer.jsp"></c:import>
             </div>
         </div>
+        <%--<div class="footer navbar navbar-fixed-bottom">
+            <div class="container">
+                <c:import url="inc/footer.jsp"></c:import>
+            </div>
+        </div>--%>
     </div>
 </div>
 </body>
