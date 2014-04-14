@@ -9,12 +9,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import org.in.placement.model.Skill;
 import org.in.placement.model.Student;
 import org.in.placement.util.DataSource;
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS student
 * */
 
 
- /**
+/**
  * @author traw
  */
 public class StudentDaoImpl implements StudentDao {
@@ -48,8 +48,138 @@ public class StudentDaoImpl implements StudentDao {
         // TODO Auto-generated constructor stub
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * getStudentsForJSONQuery: takes JSON Object to query students,
+     * jsonQuery: contains elements used to query Students from Database
+     * Supported Parameters are :
+     * student_id : Student ID Number is an Integer.
+     * student_name : Name of the Student.
+     * student_email_id : Student Email ID.
+     * student_is_placed : If student is placed Or not
+     * student_ssc_marks : student SSC Marks
+     * student_ssc_marks_condition : student SSC Marks Condition, Based on which
+     * Students will be selected .
+     * Default Condition is ==.
+     * student_hsc_marks : student HSC Marks
+     * student_hsc_marks_condition : student HSC Marks Condition, Based on which
+     * Students will be selected. Default Condition is ==.
+     * student_mca_marks : student MCA Marks
+     * student_mca_marks_condition : student MCA Marks Condition, Based on which
+     * Students  will be selected. Default Condition is ==.
+     *
+     * @param jsonQuery
+     * @return
+     */
+    @Override
+    public List<Student> getStudentsForJSONQuery(JSONObject jsonQuery) throws PropertyVetoException, SQLException {
+
+        int propertyToInsertCount = 0;
+        Map<Integer, Object> propertyIndexMap = new HashMap<>();
+        List<Student> studentList = new ArrayList<>();
+        StringBuffer studentSqlQuery = new StringBuffer();
+        studentSqlQuery.append("SELECT * FROM " + StudentDao.STUDENT_TABLE);
+        if (jsonQuery.size() > 0) {
+
+            studentSqlQuery.append(WHERE);
+
+            String studentId = (String) jsonQuery.get(STUDENT_ID_QUERY_CONDITION);
+            if (studentId != null) {
+                studentSqlQuery.append(STUDENT_ID).append(EQUAL_TO_CONDITION).append(QUESTION_MARK);
+                propertyIndexMap.put(++propertyToInsertCount, Long.parseLong(studentId));
+            }
+
+            String studentName = (String) jsonQuery.get(STUDENT_NAME_QUERY_CONDITION);
+            if (studentName != null) {
+                studentSqlQuery.append(AND_CONDITION).append(STUDENT_NAME).append(LIKE_CONDITION).append(QUESTION_MARK);
+                propertyIndexMap.put(++propertyToInsertCount, studentName);
+            }
+
+            String studentEmail = (String) jsonQuery.get(STUDENT_EMAIL_ID_QUERY_CONDITION);
+            if (studentEmail != null) {
+                studentSqlQuery.append(AND_CONDITION).append(EMAIL_ID).append(LIKE_CONDITION).append(QUESTION_MARK);
+                propertyIndexMap.put(++propertyToInsertCount, studentEmail);
+            }
+
+            boolean selectIsPlaced = Boolean.parseBoolean((String) jsonQuery.get(SELECT_STUDENT_IS_PLACED_QUERY_CONDITION));
+            if (selectIsPlaced) {
+                boolean studentIsPlaced = Boolean.parseBoolean((String) jsonQuery.get(STUDENT_IS_PLACED_QUERY_CONDITION));
+                studentSqlQuery.append(AND_CONDITION).append(IS_PLACED).append(LIKE_CONDITION).append(QUESTION_MARK);
+                propertyIndexMap.put(++propertyToInsertCount, studentIsPlaced);
+            }
+
+            String studentSscMarks = (String) jsonQuery.get(STUDENT_SSC_MARKS_QUERY_CONDITION);
+            if (studentSscMarks != null) {
+                studentSqlQuery.append(AND_CONDITION).append(SSC_MARKS).
+                        append((String) jsonQuery.get(STUDENT_SSC_MARKS_CONDITION_QUERY_CONDITION)).append(QUESTION_MARK);
+                propertyIndexMap.put(++propertyToInsertCount, Long.parseLong(studentSscMarks));
+            }
+
+            String studentHscMarks = (String) jsonQuery.get(STUDENT_HSC_MARKS_QUERY_CONDITION);
+            if (studentHscMarks != null) {
+                studentSqlQuery.append(AND_CONDITION).append(HSC_MARKS).
+                        append((String) jsonQuery.get(STUDENT_HSC_MARKS_CONDITION_QUERY_CONDITION)).append(QUESTION_MARK);
+                propertyIndexMap.put(++propertyToInsertCount, Long.parseLong(studentHscMarks));
+            }
+
+            String studentMcaMarks = (String) jsonQuery.get(STUDENT_MCA_MARKS_QUERY_CONDITION);
+            if (studentMcaMarks != null) {
+                studentSqlQuery.append(AND_CONDITION).append(MCA_MARKS).
+                        append((String) jsonQuery.get(STUDENT_MCA_MARKS_CONDITION_QUERY_CONDITION)).append(QUESTION_MARK);
+                propertyIndexMap.put(++propertyToInsertCount, Long.parseLong(studentMcaMarks));
+            }
+        }
+
+        String query = studentSqlQuery.toString();
+        DataSource dataSource = DataSource.getInstance();
+        try (Connection connection = dataSource.getConnection()) {
+            try (PreparedStatement statement = connection
+                    .prepareStatement(query)) {
+
+
+                for (int count = 1; count <= propertyIndexMap.size(); ++count) {
+                    Object o = propertyIndexMap.get(count);
+                    if (o instanceof Long) {
+                        statement.setLong(count, (Long) o);
+                    } else if (o instanceof String) {
+                        statement.setString(count, (String) o);
+                    } else if (o instanceof Boolean) {
+                        statement.setBoolean(count, (Boolean) o);
+                    }
+                }
+
+                try (ResultSet res = statement.executeQuery()) {
+                    if (res.next()) {
+                        log.error("StudentDaoImpl71");
+                        Student stud = new Student();
+                        stud.setId(res.getLong(STUDENT_ID));
+                        stud.setName(res.getString(STUDENT_NAME));
+                        stud.setEmail(res.getString(EMAIL_ID));
+                        stud.setPassword(res.getString(PASSWORD));
+                        stud.setPlaced(res.getBoolean(IS_PLACED));
+                        stud.setSscMark(res.getFloat(SSC_MARKS));
+                        stud.setHscMark(res.getFloat(HSC_MARKS));
+                        stud.setMcaMark(res.getFloat(MCA_MARKS));
+                        studentList.add(stud);
+                    }
+                    log.error("StudentDaoImpl82");
+                } catch (SQLException e) {
+                    log.error("Placement85: " + e.getMessage(), e);
+                    e.printStackTrace();
+                    throw e;
+                }
+            } catch (SQLException e) {
+                log.error("Placement90: " + e.getMessage(), e);
+                e.printStackTrace();
+                throw e;
+            }
+        }
+
+        return studentList;
+
+    }
+
+    /**
+     * (non-Javadoc)     *
      *
      * @see org.in.placement.dao.StudentDao#getStudentForID(long)
      * throw PropertyVetoException, SQLException
@@ -58,11 +188,9 @@ public class StudentDaoImpl implements StudentDao {
     public Student getStudentForID(long studentID)
             throws PropertyVetoException, SQLException {
         Student stud = null;
-        String sqlQuery = "SELECT * FROM student WHERE id = ?";
+        String sqlQuery = "SELECT * FROM " + StudentDao.STUDENT_TABLE + " WHERE id = ?";
 
-        DataSource dataSource = null;
-
-        dataSource = DataSource.getInstance();
+        DataSource dataSource = DataSource.getInstance();
         try (Connection connection = dataSource.getConnection()) {
             try (PreparedStatement statement = connection
                     .prepareStatement(sqlQuery)) {
@@ -70,12 +198,12 @@ public class StudentDaoImpl implements StudentDao {
                 try (ResultSet res = statement.executeQuery()) {
                     if (res.next()) {
                         log.error("StudentDaoImpl71");
-                                stud = new Student();
+                        stud = new Student();
                         stud.setId(res.getLong(STUDENT_ID));
                         stud.setName(res.getString(STUDENT_NAME));
                         stud.setEmail(res.getString(EMAIL_ID));
                         stud.setPassword(res.getString(PASSWORD));
-                        stud.setPlaced(res.getBoolean(PLACED));
+                        stud.setPlaced(res.getBoolean(IS_PLACED));
                         stud.setSscMark(res.getFloat(SSC_MARKS));
                         stud.setHscMark(res.getFloat(HSC_MARKS));
                         stud.setMcaMark(res.getFloat(MCA_MARKS));
@@ -104,7 +232,7 @@ public class StudentDaoImpl implements StudentDao {
     public List<Student> getStudents() throws PropertyVetoException,
             SQLException {
         List<Student> students = new ArrayList<Student>();
-        String sql = "SELECT * FROM student";
+        String sql = "SELECT * FROM " + STUDENT_TABLE;
 
         DataSource dataSource = DataSource.getInstance();
         try (Connection connection = dataSource.getConnection()) {
@@ -116,7 +244,7 @@ public class StudentDaoImpl implements StudentDao {
                         stud.setName(res.getString(STUDENT_NAME));
                         stud.setEmail(res.getString(EMAIL_ID));
                         stud.setPassword(res.getString(PASSWORD));
-                        stud.setPlaced(res.getBoolean(PLACED));
+                        stud.setPlaced(res.getBoolean(IS_PLACED));
                         stud.setSscMark(res.getFloat(SSC_MARKS));
                         stud.setHscMark(res.getFloat(HSC_MARKS));
                         stud.setMcaMark(res.getFloat(MCA_MARKS));
@@ -142,9 +270,9 @@ public class StudentDaoImpl implements StudentDao {
     public List<Student> getStudentsForSkillALike(String skillName)
             throws PropertyVetoException, SQLException {
         List<Student> students = new ArrayList<Student>();
-        String sqlQuery = " SELECT * FROM student WHERE id IN ("
-                + " SELECT student_id FROM student_skill WHERE skill_id IN ("
-                + " SELECT id FROM skill WHERE name LIKE ?))";
+        String sqlQuery = " SELECT * FROM "+STUDENT_TABLE+ WHERE + "id IN ("
+                + " SELECT student_id FROM "+ STUDENT_SKILL_TABLE +" WHERE skill_id IN ("
+                + " SELECT id FROM "+ SKILL_TABLE +" WHERE name LIKE ?))";
 
         DataSource dataSource = DataSource.getInstance();
         try (Connection connection = dataSource.getConnection()) {
@@ -158,7 +286,7 @@ public class StudentDaoImpl implements StudentDao {
                         stud.setName(res.getString(STUDENT_NAME));
                         stud.setEmail(res.getString(EMAIL_ID));
                         stud.setPassword(res.getString(PASSWORD));
-                        stud.setPlaced(res.getBoolean(PLACED));
+                        stud.setPlaced(res.getBoolean(IS_PLACED));
                         stud.setSscMark(res.getFloat(SSC_MARKS));
                         stud.setHscMark(res.getFloat(HSC_MARKS));
                         stud.setMcaMark(res.getFloat(MCA_MARKS));
@@ -184,11 +312,11 @@ public class StudentDaoImpl implements StudentDao {
     @Override
     public void saveStudents(Student... students) throws SQLException,
             PropertyVetoException {
-        String sqlQuery = "INSERT INTO student "
+        String sqlQuery = "INSERT INTO "+ STUDENT_TABLE
                 + " (name, email, password, placed, sscMark, hscmark, mcamark)"
                 + " VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        String updateQuery = "UPDATE student "
+        String updateQuery = "UPDATE " + STUDENT_TABLE
                 + " SET "
                 + " name = ? , email = ?, password= ?, placed = ?, sscMark = ?, hscmark = ?, mcamark =?";
 
@@ -240,7 +368,7 @@ public class StudentDaoImpl implements StudentDao {
     public List<Skill> getStudentSkills(long studentID) throws SQLException,
             PropertyVetoException {
         List<Skill> skills = new ArrayList<Skill>();
-        String skillQuery = "SELECT * FROM skill " + "WHERE id IN ("
+        String skillQuery = "SELECT * FROM "+ SKILL_TABLE+ WHERE +" id IN ("
                 + "SELECT  skill_id FROM student_skill "
                 + "WHERE  student_id = ?)";
 
@@ -307,7 +435,6 @@ public class StudentDaoImpl implements StudentDao {
             deleteStudent(students[0].getId());
             return;
         }
-        String deleteQuery = "DELETE FROM student WHERE id = ?";
         long studentID;
         DataSource dataSource = DataSource.getInstance();
 
@@ -315,16 +442,7 @@ public class StudentDaoImpl implements StudentDao {
             connection.setAutoCommit(false);
             for (Student student : students) {
                 studentID = student.getId();
-                deleteStudentSkills(studentID, connection);
-                try (PreparedStatement statement = connection
-                        .prepareStatement(deleteQuery)) {
-                    statement.setLong(1, studentID);
-                    statement.execute();
-                } catch (SQLException e) {
-                    connection.rollback();
-                    connection.setAutoCommit(true);
-                    throw e;
-                }
+                deleteStudent(studentID, connection);
             }
             connection.commit();
             connection.setAutoCommit(true);
@@ -334,24 +452,29 @@ public class StudentDaoImpl implements StudentDao {
     @Override
     public void deleteStudent(long studentID) throws PropertyVetoException,
             SQLException {
-        String deleteQuery = "DELETE FROM student WHERE id = ?";
-
         DataSource dataSource = DataSource.getInstance();
         try (Connection connection = dataSource.getConnection()) {
             connection.setAutoCommit(false);
-            deleteStudentSkills(studentID, connection);
-            try (PreparedStatement statement = connection
-                    .prepareStatement(deleteQuery)) {
-                statement.setLong(1, studentID);
-                statement.execute();
-            } catch (SQLException e) {
-                connection.rollback();
-                connection.setAutoCommit(true);
-                throw e;
-            }
+            deleteStudent(studentID, connection);
             connection.commit();
             connection.setAutoCommit(true);
         }
+    }
+
+    private void deleteStudent(long studentID, Connection connection) throws SQLException {
+        String deleteQuery = "DELETE FROM " + StudentDao.STUDENT_TABLE + WHERE +" id = ?";
+        deleteStudentSkills(studentID, connection);
+        try (PreparedStatement statement = connection
+                .prepareStatement(deleteQuery)) {
+            statement.setLong(1, studentID);
+            statement.execute();
+        } catch (SQLException e) {
+            connection.rollback();
+            connection.setAutoCommit(true);
+            throw e;
+        }
+        connection.commit();
+        connection.setAutoCommit(true);
     }
 
     private void deleteStudentSkills(long studentID, Connection connection)
@@ -382,7 +505,8 @@ public class StudentDaoImpl implements StudentDao {
     @Override
     public void deleteStudentSkills(Student student, Skill... skills)
             throws PropertyVetoException, SQLException {
-        String deleteStudentSkillQuery = "DELETE FROM student_skill WHERE student_id = ? AND skill_id = ?";
+        String deleteStudentSkillQuery = "DELETE FROM " + StudentDao.STUDENT_SKILL_TABLE + WHERE
+                + STUDENT_SKILL_TABLE_STUDENT_ID + " = ? AND " + STUDENT_SKILL_TABLE_SKILL_ID + " = ?";
         long studentID = student.getId();
         DataSource dataSource = DataSource.getInstance();
         try (Connection connection = dataSource.getConnection()) {
@@ -407,7 +531,7 @@ public class StudentDaoImpl implements StudentDao {
     @Override
     public void addSkill(Skill... skills) throws PropertyVetoException,
             SQLException {
-        String insertSkillQuery = "INSERT INTO skill (name) VALUES (?)";
+        String insertSkillQuery = "INSERT INTO " + StudentDao.SKILL_TABLE + " (name) VALUES (?)";
 
         DataSource dataSource = DataSource.getInstance();
         try (Connection connection = dataSource.getConnection()) {
@@ -431,7 +555,7 @@ public class StudentDaoImpl implements StudentDao {
     @Override
     public void deleteSkill(Skill... skills) throws PropertyVetoException,
             SQLException {
-        String insertSkillQuery = "DELETE FROM skill WHERE id = ?)";
+        String insertSkillQuery = "DELETE FROM " + StudentDao.SKILL_TABLE + " WHERE id = ?)";
 
         DataSource dataSource = DataSource.getInstance();
         try (Connection connection = dataSource.getConnection()) {
@@ -454,7 +578,7 @@ public class StudentDaoImpl implements StudentDao {
     }
 
     private void cascadeDeleteSkill(long skillID, Connection connection) throws PropertyVetoException, SQLException {
-        String deleteStudentSkill = "DELETE FROM student_skill WHERE skill_id = ?";
+        String deleteStudentSkill = "DELETE FROM " + StudentDao.STUDENT_SKILL_TABLE + " WHERE skill_id = ?";
         try (PreparedStatement statement = connection.prepareStatement(deleteStudentSkill)) {
             statement.setLong(1, skillID);
         } catch (SQLException e) {

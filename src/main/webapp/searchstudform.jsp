@@ -1,149 +1,218 @@
-<div class="container-fluid">
-    <div class="row">
-        <ul class="nav nav-pills nav-stacked">
-            <li>
-                <form name="studSearchForm" action="" method="post" class="form-inline" role="form">
-                    <div class="table table-responsive">
-                        <table class="table-bordered" cellpadding="5">
-                            <tr>
-                                <%-- <td><span class="input-group-addon">Student ID</span></td>--%>
-                                <td><input type="text" class="form-control" name="studID" placeholder="Student ID"></td>
-                                <td>
-                                    <%--<span class="input-group-addon">Student Name</span></td>--%>
-                                <td>
-                                    <input type="text" class="form-control" name="studName" placeholder="Student Name">
-                                </td>
-                            </tr>
-                            <tr>
-                                <%--<td><span class="input-group-addon">Email ID</span></td>--%>
-                                <td>
-                                    <input type="email" class="form-control" name="emailid" placeholder="Email ID">
-                                </td>
-                                <td><span class="input-group-addon">Is placed</span></td>
-                                <td><input type="checkbox" class="form-control" name="isplaced" placeholder="isplaced">
-                                </td>
-                            </tr>
-                            <tr>
-                                <%--<td><span class="input-group-addon">SSC Marks</span></td>--%>
-                                <td><input type="text" class="form-control" name="sscmarks" placeholder="SSC Marks">
-                                </td>
-                                <td>
-                                    <select id="sscMarksCondition" class="form-control">
-                                        <option>==</option>
-                                        <option>&lt;=</option>
-                                        <option>&gt;</option>
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <%--<td><span class="input-group-addon">HSC Marks</span></td>--%>
-                                <td><input type="text" class="form-control" name="hscmarks" placeholder="HSC Marks">
-                                </td>
-                                <td>
-                                    <select id="hscMarksCondition" class="form-control">
-                                        <option>==</option>
-                                        <option>&lt;=</option>
-                                        <option>&gt;</option>
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <%--<td><span class="input-group-addon">MCA Marks</span></td>--%>
-                                <td><input type="text" class="form-control" name="mcamarks" placeholder="MCA Marks">
-                                </td>
-                                <td>
-                                    <select id="mcaMarksCondition" class="form-control">
-                                        <option>==</option>
-                                        <option>&lt;=</option>
-                                        <option>&gt;</option>
-                                    </select>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                    <div class="control-group">
-                        <button type="submit" class="btn center-block" onclick="return searchStudents(this.form);"
-                                style="width: 159px; ">Search
-                        </button>
-                        <div class="controls">
-                        </div>
-                    </div>
-                </form>
-            </li>
-            <li>
-                <div id="alerts" class="alert hidden">
-                    <strong>HI Rajdip!!!</strong>
+<fieldset>
+    <legend><p class="text-info text-left">Student Search Form</p></legend>
+    <form class="form" name="studSearchForm" action="" method="post" role="form"
+          onsubmit="return searchStudents(this.form);">
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <input class="form-control" id="student_id" name="studID" size="30" type="text"
+                           placeholder="Student ID">
                 </div>
-            </li>
-        </ul>
-        <hr>
-    </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <input class="form-control" id="student_name" name="name" size="30" type="text"
+                           placeholder="Student Name">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <input class="form-control" id="student_email_id" name="student[email]" size="30" type="email"
+                           placeholder="Student Email ID">
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group input-group">
+                	<span class="input-group-addon">
+        				<input id="select_is_placed" type="checkbox">
+      				</span>
+                    <select id="student_is_placed" class="form-control">
+                        <option>IsPlaced</option>
+                        <option>Not Placed</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <input class="form-control" id="student_ssc_marks" name="student[sscmarks]" size="30" type="text"
+                           placeholder="Student SSC Marks">
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group input-group">
+                    <span class="input-group-addon">SSC Marks Condition</span>
+                    <select id="student_ssc_marks_condition" class="form-control">
+                        <option></option>
+                        <option>=</option>
+                        <option>&lt;=</option>
+                        <option>&gt;=</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <input class="form-control" id="student_hsc_marks" name="student[hscmarks]" size="30" type="text"
+                           placeholder="Student HSC Marks">
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group input-group">
+                    <span class="input-group-addon">
+        				<span class="">HSC Marks Condition</span>
+      				</span>
+                    <select id="student_hsc_marks_condition" class="form-control">
+                        <option></option>
+                        <option>=</option>
+                        <option>&lt;=</option>
+                        <option>&gt;=</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <input class="form-control" id="student_mca_marks" name="student[mcamarks]" size="30" type="text"
+                           placeholder="Student MCA Marks">
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group input-group">
+                    <span class="input-group-addon">
+        			    <span class="">MCA Marks Condition</span>
+      				</span>
+                    <select id="student_mca_marks_condition" class="form-control">
+                        <option></option>
+                        <option>=</option>
+                        <option>&lt;=</option>
+                        <option>&gt;=</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4">
+                <%--<button type="submit" id="btnSearch" class="btn btn-primary" onclick="return searchStudents(this.form);">Search</button>--%>
+                <button type="submit" class="btn center-block bg-primary" style="width: 159px; ">
+                    <span>Search</span>
+                </button>
+            </div>
+            <div class="col-sm-4">
+                <button type="reset" class="btn bg-primary" style="width: 159px; ">
+                    <span>Reset</span>
+                </button>
+            </div>
+        </div>
+    </form>
+</fieldset>
+<div id="alerts" class="alert hidden">
+    <strong>HI Rajdip!!!</strong>
 </div>
+<hr>
 
 <script type="text/javascript">
     function validateForm(form) {
+        var studentSearch = {};
         var ret = true;
-        var studID = form.studID.value;
+        var studID = document.getElementById('student_id').value;
         document.getElementById("alerts").innerHTML = "";
-        if (studID != "" && isNaN(studID)) {
+        if (isNaN(studID)) {
             document.getElementById("alerts").innerHTML = "Please Enter valid Number!!!";
             ret = false;
             console.log(127);
+        } else {
+            studentSearch['student_id'] = studID;
         }
-        var emailAddress = form.emailid.value;
-        if (emailAddress != "") {
+
+        var emailAddress = document.getElementById('student_email_id').value;
+        if (emailAddress != 'undefined' && emailAddress != '') {
             var atpos = emailAddress.indexOf("@");
             var dotpos = emailAddress.lastIndexOf(".");
             if (atpos < 1 || dotpos < atpos + 2 || dotpos + 2 >= x.length) {
                 document.getElementById("alerts").innerHTML.concat("&lt;br/&gt;Not a valid e-mail address");
                 ret = false;
                 console.log(193);
+            } else {
+                studentSearch['student_email_id'] = emailAddress;
             }
         }
-        var sscMarks = form.sscmarks.value;
-        if (sscMarks != "" && isNaN(sscMarks)) {
-            document.getElementById("alerts").innerHTML.concat("&lt;br/&gt;Invalid SSC Marks entered");
-            ret = false;
-            console.log(147);
+
+        var isPlacedIsSelected = document.getElementById('select_is_placed');
+        if (isPlacedIsSelected.checked) {
+            var studentIsPlaced = document.getElementById('student_is_placed').value;
+            studentSearch['student_is_placed'] = studentIsPlaced;
         }
-        var hscMarks = form.hscmarks.value;
-        if (hscMarks != "" && isNaN(hscMarks)) {
-            document.getElementById("alerts").innerHTML.concat("&lt;br/&gt;Invalid HSC Marks entered");
-            ret = false;
-            console.log(153);
+
+        var sscMarks = document.getElementById('student_ssc_marks').value;
+        var sscMarksCondition = document.getElementById('student_ssc_marks_condition').value;
+        if (sscMarks != '') {
+            if (isNaN(sscMarks)) {
+                document.getElementById("alerts").innerHTML.concat("&lt;br/&gt;Invalid SSC Marks entered");
+                ret = false;
+                console.log(147);
+            } else if (sscMarksCondition == '') {
+                document.getElementById("alerts").innerHTML.concat("&lt;br/&gt;Please select SSC Marks Condition");
+            } else {
+                studentSearch['student_ssc_marks'] = sscMarks;
+                studentSearch['student_ssc_marks_condition'] = sscMarksCondition;
+            }
         }
-        var mcaMarks = form.mcamarks.value;
-        if (sscMarks != "" && isNaN(mcaMarks)) {
-            document.getElementById("alerts").innerHTML.concat("&lt;br/&gt;Invalid HSC Marks entered");
-            ret = false;
-            console.log(158);
+
+        var hscMarks = document.getElementById('student_hsc_marks').value;
+        var hscMarksCondition = document.getElementById('student_hsc_marks_condition').value;
+        if (hscMarks != '') {
+            if (isNaN(hscMarks)) {
+                document.getElementById("alerts").innerHTML.concat("&lt;br/&gt;Invalid HSC Marks entered");
+                ret = false;
+                console.log(153);
+            } else if (hscMarksCondition == '') {
+                document.getElementById("alerts").innerHTML.concat("&lt;br/&gt;Please select HSC Marks Condition");
+            } else {
+                studentSearch['student_hsc_marks'] = sscMarks;
+                studentSearch['student_hsc_marks_condition'] = sscMarksCondition;
+            }
         }
+
+        var mcaMarks = document.getElementById('student_mca_marks').value;
+        var mcaMarksCondition = document.getElementById('student_mca_marks_condition').value;
+        if (mcaMarks != '') {
+            if (isNaN(mcaMarks)) {
+                document.getElementById("alerts").innerHTML.concat("&lt;br/&gt;Invalid HSC Marks entered");
+                ret = false;
+                console.log(158);
+            } else if (mcaMarksCondition == '') {
+                document.getElementById("alerts").innerHTML.concat("&lt;br/&gt;Please select MCA Marks Condition");
+            } else {
+                studentSearch['student_mca_marks'] = sscMarks;
+                studentSearch['student_mca_marks_condition'] = sscMarksCondition;
+            }
+        }
+
         if (ret == false) {
             document.getElementById("alerts").setAttribute('class', 'alert alert-danger show');
         }
-        return ret;
+        studentSearch['validated'] = ret;
+        return studentSearch;
     }
 
     function searchStudents(form) {
-        if (validateForm(form) == false) {
+        var stud = validateForm(form);
+        if (stud['valiedated'] == false) {
             console.log("Form validation failed");
-            //return false;
+            return false;
         }
-
+        console.log(JSON.stringify(stud));
         var param = {};
-        for (var i = 0; i < form.length; i++) {
-            console.log(form.elements[i].name + ":" + form.elements[i].type);
-            if (form.elements[i].value != "" &&
-                    ((form.elements[i].type == "email") ||
-                            (form.elements[i].type == "text") ||
-                            (form.elements[i].type == "checkbox")
-                            )) {
-                param[form.elements[i].name] = form.elements[i].value;
-            }
-        }
+        param['studentQuery'] = stud;
         console.log("140");
-        $.get('viewstud.jsp', param, function (resultText) {
-            console.log(JSON.stringify(resultText));
+        $.get('SearchStudents.jsp', stud, function (resultText) {
+            console.log("Rajdip148: " + JSON.stringify(resultText));
             if (resultText.hasOwnProperty('error')) {
                 document.getElementById("alerts").innerHTML = resultText['error'];
                 document.getElementById("alerts").setAttribute('class', 'alert alert-danger show');
@@ -197,9 +266,7 @@
             var studentRow = jsonObject.students[row];
             for (var column = 0; column < studentColumnCounter; column++) {
                 var rowTDEle = document.createElement('td');
-                rowTDEle.setAttribute('class', 'text-center');
                 rowTDEle.innerHTML = studentRow[column];
-
                 tableRowEle.appendChild(rowTDEle);
             }
             studentTableEle.appendChild(tableRowEle);

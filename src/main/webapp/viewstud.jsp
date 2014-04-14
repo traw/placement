@@ -21,15 +21,6 @@
 <%
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
-
-    Enumeration<String> paramNameList = request.getParameterNames();
-    while (paramNameList.hasMoreElements()) {
-        String param = paramNameList.nextElement();
-        logger.error("RAJ22:" + param + ": "+request.getParameter(param));
-    }
-
-
-
     JSONObject jsonObject = new JSONObject();
     String errLabel = "error", errMsg;
     String studID = (String)request.getParameter("studID");
@@ -38,8 +29,6 @@
         logger.error("Invalid Student Id" + studID);
         jsonObject.put(errLabel, errMsg);
     } else {
-
-        logger.error("Rajdip31: " + studID);
         StudentDao studentDao = new StudentDaoImpl();
         try {
             Student student = studentDao.getStudentForID(Long.parseLong(studID));

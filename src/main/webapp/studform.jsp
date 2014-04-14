@@ -1,62 +1,56 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8" %>
 
 
-<% String path = request.getContextPath();
-    String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + path + "/";
-%>
-
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <%@include file="inc/taglibs.jsp" %>
 <html>
 <head>
-    <base href="<%=basePath%>">
-
     <title>Placement</title>
     <c:import url="inc/meta.jsp"></c:import>
 
 </head>
 <body>
 
-<div class="container-fluid">
-    <div class="row-fluid">
-        <div class="col-md-12">
-            <div class="alert alert-info">
-                <h4>Placement Cell</h4>
+<div class="page-container">
+    <c:import url="inc/header.jsp"></c:import>
+    <div class="container">
+        <div class="row row-offcanvas row-offcanvas-left">
+            <!-- sidebar -->
+            <div class="col-xs-3 col-sm-2 sidebar-offcanvas " id="sidebar" role="navigation">
+                <div data-spy="affix" data-offset-top="45" data-offset-bottom="90">
+                    <ul class="nav" id="sidebar-nav">
+                        <li>
+                            <a name="searchStudent" id="search_student" onclick="getOperation('search_student');"
+                               title="searchstudform.jsp">
+                                Search Student
+                            </a>
+                        </li>
+                        <%-- <li><a href="#">Add Student</a></li>
+                         <li><a href="#">Delete Student</a></li>
+                         <li><a href="#">Get Skill</a></li>
+                         <li><a href="#">Update Skill</a></li>
+                         <li><a href="#">Delete Skill</a></li>
+                         <li><a href="#">View Companies</a></li>
+                         <li><a href="#">Search Companies</a></li>
+                         <li><a href="#">Search Student for comapany</a></li>--%>
+                    </ul>
+                </div>
             </div>
-        </div>
-    </div>
-    <div class="row-fluid">
-        <div class="col-md-3">
-            <!-- left -->
-            <a href="#"><strong><i class="glyphicon glyphicon-briefcase"></i> Toolbox</strong></a>
-            <hr>
-            <ul class="nav nav-pills nav-stacked">
-                <li><a href="#"><i class="glyphicon glyphicon-flash"></i> Search Student</a></li>
-                <li><a href="#"><i class="glyphicon glyphicon-link"></i> Add Student</a></li>
-                <li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Delete Student</a></li>
-                <li><a href="#"><i class="glyphicon glyphicon-book"></i> Get Student Skill</a></li>
-                <li><a href="#"><i class="glyphicon glyphicon-briefcase"></i> Delete Skills</a></li>
-                <li><a href="#"><i class="glyphicon glyphicon-time"></i> View Companies</a></li>
-                <li><a href="#"><i class="glyphicon glyphicon-plus"></i> Search Companies</a></li>
-            </ul>
-            <hr>
-        </div>
-        <div class="col-md-9">
-            <c:import url="searchstudform.jsp"></c:import>
-            <div id="result" class="hidden"></div>
-        </div>
 
-        <div id="footer navbar navbar-fixed-bottom">
-            <div class="container">
-                <c:import url="inc/footer.jsp"></c:import>
+            <!-- main area -->
+            <div class="col-xs-9 col-sm-9" data-spy="scroll" data-target="#sidebar-nav">
+                <div name="operationName" id="operation_id">
+                    <c:import url="searchstudform.jsp"></c:import>
+                </div>
+                <div name="resultName" id="result_id" class="row hidden"></div>
             </div>
         </div>
-        <%--<div class="footer navbar navbar-fixed-bottom">
-            <div class="container">
-                <c:import url="inc/footer.jsp"></c:import>
-            </div>
-        </div>--%>
+        <!-- /.col-xs-12 main -->
     </div>
+    <!--/.row-->
+    <c:import url="inc/footer.jsp"></c:import>
 </div>
+<!--/.container-->
+<c:import url="inc/commonFunction.jsp"></c:import>
 </body>
 </html>
