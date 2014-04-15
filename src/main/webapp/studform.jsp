@@ -20,26 +20,26 @@
                 <div data-spy="affix" data-offset-top="45" data-offset-bottom="90">
                     <ul class="nav" id="sidebar-nav">
                         <li>
-                            <a name="searchStudent" id="search_student" onclick="getOperation('search_student');"
-                               title="searchstudform.jsp">
+                            <a name="searchstudform.jsp" id="search_student" onclick="getOperation('search_student');"
+                               title="Search Student">
                                 Search Student
                             </a>
                         </li>
-                        <%-- <li><a href="#">Add Student</a></li>
+                         <li><a href="#">Add Student</a></li>
                          <li><a href="#">Delete Student</a></li>
                          <li><a href="#">Get Skill</a></li>
                          <li><a href="#">Update Skill</a></li>
                          <li><a href="#">Delete Skill</a></li>
                          <li><a href="#">View Companies</a></li>
                          <li><a href="#">Search Companies</a></li>
-                         <li><a href="#">Search Student for comapany</a></li>--%>
+                         <li><a href="#">Search Student for company</a></li>
                     </ul>
                 </div>
             </div>
 
             <!-- main area -->
             <div class="col-xs-9 col-sm-9" data-spy="scroll" data-target="#sidebar-nav">
-                <div name="operationName" id="operation_id">
+                <div name="operationName" id="scratchpad">
                     <c:import url="searchstudform.jsp"></c:import>
                 </div>
                 <div name="resultName" id="result_id" class="row hidden"></div>
@@ -52,5 +52,7 @@
 </div>
 <!--/.container-->
 <c:import url="inc/commonFunction.jsp"></c:import>
+<c:import url="searchstudentform.jsp"></c:import>
+<script type="text/javascript" src="searchstudentform.jsp"></script>
 </body>
 </html>
