@@ -69,4 +69,3 @@ CREATE TABLE IF NOT EXIST user
   password varchar(30) NOT NULL,
   PRIMARY KEY(username)
 );
-

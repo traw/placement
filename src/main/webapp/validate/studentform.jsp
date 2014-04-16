@@ -92,7 +92,6 @@ function searchStudents(form) {
     console.log(JSON.stringify(stud));
     var param = {};
     param['studentQuery'] = stud;
-    console.log("140");
     var debug = true;
     if (debug) {
         var resultEle = document.getElementById('scratchpad');
@@ -105,7 +104,7 @@ function searchStudents(form) {
                 document.getElementById("alerts").setAttribute('class', 'alert alert-danger show');
                 return false;
             }
-            var resultEle = document.getElementById('scratchpad');
+            var resultEle = document.getElementById('result_id');
             createAndShowTable(resultText, resultEle);
         }, 'JSON');
     }
@@ -176,7 +175,7 @@ function createAndShowTable(jsonObject, parentEle) {
         }
 
         var rowTDEle = document.createElement('td');
-        rowTDEle.innerHTML = '<button type="button" class="btn btn-xs btn-danger" id="delete-stud-btn" data-toggle="modal" data-target="#confirmDelete"data-title="Delete User" data-message="Are you sure you want to delete this Student ?" onclick="deleteTableRaw(this)"><i class="glyphicon glyphicon-warning-sign glyphicon-align-center"></i></button>';
+        rowTDEle.innerHTML = '<button type="button" class="btn btn-xs btn-danger" id="delete-stud-btn" data-toggle="modal" data-target="#confirmDelete"data-title="Delete User" data-message="Are you sure you want to delete this Student ?" onclick="editStudent(this)"><i class="glyphicon glyphicon-warning-sign glyphicon-align-center"></i></button>';
         tableRowEle.appendChild(rowTDEle);
         studentTableEle.appendChild(tableRowEle);
     }
@@ -203,5 +202,12 @@ function deleteTableRaw(button) {
         }, 'JSON');
         rawEle.parentNode.removeChild(rawEle);
     }
+}
+
+function editStudent(button){
+    var selectedRow = button.parentNode.parentNode;
+    var rowText = selectedRow.innerText;
+    var formEle = document.getElementById('studForm_id');
+
 }
 </script>

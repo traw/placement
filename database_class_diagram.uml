@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>DATABASE</ID>
+  <OriginalElement>0a28812c-4a14-41b2-9000-56866ce9090e.schema:postgres.public</OriginalElement>
+  <nodes>
+    <node x="308.75" y="268.5">0a28812c-4a14-41b2-9000-56866ce9090e.table:postgres.public.company_skill</node>
+    <node x="264.0" y="63.0">0a28812c-4a14-41b2-9000-56866ce9090e.table:postgres.public.skill</node>
+    <node x="521.75" y="247.0">0a28812c-4a14-41b2-9000-56866ce9090e.table:postgres.public.comapny_criteria</node>
+    <node x="0.0" y="0.0">0a28812c-4a14-41b2-9000-56866ce9090e.table:postgres.public.student</node>
+    <node x="0.0" y="405.0">0a28812c-4a14-41b2-9000-56866ce9090e.table:postgres.public.users</node>
+    <node x="75.5" y="268.5">0a28812c-4a14-41b2-9000-56866ce9090e.table:postgres.public.student_skill</node>
+    <node x="530.25" y="52.5">0a28812c-4a14-41b2-9000-56866ce9090e.table:postgres.public.company</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="0a28812c-4a14-41b2-9000-56866ce9090e.table:postgres.public.comapny_criteria" target="0a28812c-4a14-41b2-9000-56866ce9090e.table:postgres.public.company">
+      <point x="0.0" y="-56.5" />
+      <point x="36.0" y="46.0" />
+    </edge>
+    <edge source="0a28812c-4a14-41b2-9000-56866ce9090e.table:postgres.public.student_skill" target="0a28812c-4a14-41b2-9000-56866ce9090e.table:postgres.public.student">
+      <point x="-46.5" y="-35.0" />
+      <point x="0.0" y="98.5" />
+    </edge>
+    <edge source="0a28812c-4a14-41b2-9000-56866ce9090e.table:postgres.public.company_skill" target="0a28812c-4a14-41b2-9000-56866ce9090e.table:postgres.public.company">
+      <point x="48.25" y="-35.0" />
+      <point x="453.5" y="222.0" />
+      <point x="566.25" y="222.0" />
+      <point x="-36.0" y="46.0" />
+    </edge>
+    <edge source="0a28812c-4a14-41b2-9000-56866ce9090e.table:postgres.public.company_skill" target="0a28812c-4a14-41b2-9000-56866ce9090e.table:postgres.public.skill">
+      <point x="-48.25" y="-35.0" />
+      <point x="31.0" y="35.5" />
+    </edge>
+    <edge source="0a28812c-4a14-41b2-9000-56866ce9090e.table:postgres.public.student_skill" target="0a28812c-4a14-41b2-9000-56866ce9090e.table:postgres.public.skill">
+      <point x="46.5" y="-35.0" />
+      <point x="215.0" y="222.0" />
+      <point x="295.0" y="222.0" />
+      <point x="-31.0" y="35.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="377.5" y="238.0" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Key columns</Category>
+    <Category>Columns</Category>
+  </Categories>
+</Diagram>
+

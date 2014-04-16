@@ -1,4 +1,4 @@
-<%@include file="inc/taglibs.jsp"%>
+<%@include file="../inc/taglibs.jsp"%>
 <%--
   Created by IntelliJ IDEA.
   User: traw
