@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+		"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+		"http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+	<session-factory>
+		<property name="hibernate.connection.driver_class">
+			org.postgresql.Driver
+		</property>
+		<property name="hibernate.connection.password">root</property>
+		<property name="hibernate.connection.url">
+			jdbc:postgresql:postgres
+		</property>
+		<property name="hibernate.connection.username">traw</property>
+		<property name="hibernate.dialect">
+			org.hibernate.dialect.PostgreSQLDialect
+		</property>
+
+		<property name="c3p0.max_statements">200</property>
+		<property name="c3p0.max_size">500</property>
+		<property name="c3p0.timeout">1000</property>
+		<mapping resource="org/in/placementv2/model/Skill.hbm.xml" />
+		<mapping resource="org/in/placementv2/model/Company.hbm.xml" />
+		<mapping resource="org/in/placementv2/model/Student.hbm.xml" />
+		<mapping resource="org/in/placementv2/model/Users.hbm.xml" />
+	</session-factory>
+</hibernate-configuration>

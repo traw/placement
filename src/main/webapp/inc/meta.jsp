@@ -11,9 +11,11 @@
 <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
 <meta http-equiv="description" content="This is my page">
 
-<script type='text/javascript' src='<%=request.getContextPath()%>/lib/jquery-1.11.0.js'></script>
-<script type='text/javascript' src='<%=request.getContextPath()%>/lib/bootstrap-3.1.1-dist/js/bootstrap.js'></script>
 <link rel="stylesheet" href='<%=request.getContextPath()%>/lib/bootstrap-3.1.1-dist/css/bootstrap.css'>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="css/base.css" rel="stylesheet">
+
+
+<%-- bootstrap Multi Select setup --%>
+<link type="text/css" href="<%=request.getContextPath()%>/css/bootstrap-select.css">

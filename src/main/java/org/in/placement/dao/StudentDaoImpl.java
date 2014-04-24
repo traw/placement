@@ -13,7 +13,8 @@ import java.util.*;
 
 import org.in.placement.model.Skill;
 import org.in.placement.model.Student;
-import org.in.placement.util.DataSource;
+import org.in.placement.util.*;
+import org.in.placementv2.util.JspString;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,7 @@ CREATE TABLE IF NOT EXISTS student
 /**
  * @author traw
  */
-public class StudentDaoImpl implements StudentDao {
+public class StudentDaoImpl implements StudentDao, TableString, SQLDilect, JspString {
     private static final Logger log = LoggerFactory.getLogger(StudentDaoImpl.class);
 
     /**
@@ -55,16 +56,17 @@ public class StudentDaoImpl implements StudentDao {
      * student_id : Student ID Number is an Integer.
      * student_name : Name of the Student.
      * student_email_id : Student Email ID.
-     * student_is_placed : If student is placed Or not
-     * student_ssc_marks : student SSC Marks
-     * student_ssc_marks_condition : student SSC Marks Condition, Based on which
+     * is_placed : If student is placed Or not
+     * ssc_marks : student SSC Marks
+     * ssc_marks_condition : student SSC Marks Condition, Based on which
      * Students will be selected .
      * Default Condition is ==.
-     * student_hsc_marks : student HSC Marks
-     * student_hsc_marks_condition : student HSC Marks Condition, Based on which
+     * hsc_marks : student HSC Marks
+     * hsc_marks_condition : student HSC Marks Condition, Based on which
      * Students will be selected. Default Condition is ==.
-     * student_mca_marks : student MCA Marks
-     * student_mca_marks_condition : student MCA Marks Condition, Based on which
+     * mca_marks : student MCA Marks
+     * mca_marks_condition : student MCA Marks Condition, Based on which
+     *
      * Students  will be selected. Default Condition is ==.
      *
      * @param jsonQuery
@@ -77,64 +79,67 @@ public class StudentDaoImpl implements StudentDao {
         Map<Integer, Object> propertyIndexMap = new HashMap<>();
         List<Student> studentList = new ArrayList<>();
         StringBuffer studentSqlQuery = new StringBuffer();
-        studentSqlQuery.append("SELECT * FROM " + StudentDao.STUDENT_TABLE);
+        studentSqlQuery.append(SELECT + "*" + FROM + STUDENT_TABLE);
         if (jsonQuery.size() > 0) {
 
             studentSqlQuery.append(WHERE);
 
-            String studentId = (String) jsonQuery.get(STUDENT_ID_QUERY_CONDITION);
+            String studentId = (String) jsonQuery.get(ID_FIELD);
             if (studentId != null) {
-                studentSqlQuery.append(STUDENT_ID).append(EQUAL_TO_CONDITION).append(QUESTION_MARK);
+                studentSqlQuery.append(STUDENT_ID_COL).append(EQUAL_TO_CONDITION).append(QUESTION_MARK);
                 propertyIndexMap.put(++propertyToInsertCount, Long.parseLong(studentId));
             }
 
-            String studentName = (String) jsonQuery.get(STUDENT_NAME_QUERY_CONDITION);
+            String studentName = (String) jsonQuery.get(NAME_FIELD);
             if (studentName != null) {
-                studentSqlQuery.append(AND_CONDITION).append(STUDENT_NAME).append(LIKE_CONDITION).append(QUESTION_MARK);
+                studentSqlQuery.append(AND_CONDITION).append(STUDENT_NAME_COL).append(LIKE_CONDITION).append(QUESTION_MARK);
                 propertyIndexMap.put(++propertyToInsertCount, studentName);
             }
 
-            String studentEmail = (String) jsonQuery.get(STUDENT_EMAIL_ID_QUERY_CONDITION);
+            String studentEmail = (String) jsonQuery.get(EMAIL_ID_FIELD);
             if (studentEmail != null) {
-                studentSqlQuery.append(AND_CONDITION).append(EMAIL_ID).append(LIKE_CONDITION).append(QUESTION_MARK);
+                studentSqlQuery.append(AND_CONDITION).append(EMAIL_ID_COL).append(LIKE_CONDITION).append(QUESTION_MARK);
                 propertyIndexMap.put(++propertyToInsertCount, studentEmail);
             }
 
-            boolean selectIsPlaced = Boolean.parseBoolean((String) jsonQuery.get(SELECT_STUDENT_IS_PLACED_QUERY_CONDITION));
+            boolean selectIsPlaced = Boolean.parseBoolean((String) jsonQuery.get(SELECT_IS_PLACED_FIELD));
             if (selectIsPlaced) {
-                boolean studentIsPlaced = Boolean.parseBoolean((String) jsonQuery.get(STUDENT_IS_PLACED_QUERY_CONDITION));
-                studentSqlQuery.append(AND_CONDITION).append(IS_PLACED).append(LIKE_CONDITION).append(QUESTION_MARK);
+                boolean studentIsPlaced = Boolean.parseBoolean((String) jsonQuery.get(IS_PLACED_FIELD));
+                studentSqlQuery.append(AND_CONDITION).append(IS_PLACED_COL).append(LIKE_CONDITION).append(QUESTION_MARK);
                 propertyIndexMap.put(++propertyToInsertCount, studentIsPlaced);
             }
 
-            String studentSscMarks = (String) jsonQuery.get(STUDENT_SSC_MARKS_QUERY_CONDITION);
+            String studentSscMarks = (String) jsonQuery.get(SSC_MARKS_FIELD);
             if (studentSscMarks != null) {
-                studentSqlQuery.append(AND_CONDITION).append(SSC_MARKS).
-                        append((String) jsonQuery.get(STUDENT_SSC_MARKS_CONDITION_QUERY_CONDITION)).append(QUESTION_MARK);
+                studentSqlQuery.append(AND_CONDITION).append(SSC_MARKS_COL).
+                        append((String) jsonQuery.get(SSC_MARKS_CONDITION_FIELD)).append(QUESTION_MARK);
                 propertyIndexMap.put(++propertyToInsertCount, Long.parseLong(studentSscMarks));
             }
 
-            String studentHscMarks = (String) jsonQuery.get(STUDENT_HSC_MARKS_QUERY_CONDITION);
+            String studentHscMarks = (String) jsonQuery.get(HSC_MARKS_FIELD);
             if (studentHscMarks != null) {
-                studentSqlQuery.append(AND_CONDITION).append(HSC_MARKS).
-                        append((String) jsonQuery.get(STUDENT_HSC_MARKS_CONDITION_QUERY_CONDITION)).append(QUESTION_MARK);
+                studentSqlQuery.append(AND_CONDITION).append(HSC_MARKS_COL).
+                        append((String) jsonQuery.get(HSC_MARKS_CONDITION_FIELD)).append(QUESTION_MARK);
                 propertyIndexMap.put(++propertyToInsertCount, Long.parseLong(studentHscMarks));
             }
 
-            String studentMcaMarks = (String) jsonQuery.get(STUDENT_MCA_MARKS_QUERY_CONDITION);
+            String studentMcaMarks = (String) jsonQuery.get(MCA_MARKS_FIELD);
             if (studentMcaMarks != null) {
-                studentSqlQuery.append(AND_CONDITION).append(MCA_MARKS).
-                        append((String) jsonQuery.get(STUDENT_MCA_MARKS_CONDITION_QUERY_CONDITION)).append(QUESTION_MARK);
+                studentSqlQuery.append(AND_CONDITION).append(MCA_MARKS_COL).
+                        append((String) jsonQuery.get(MCA_MARKS_CONDITION_FIELD)).append(QUESTION_MARK);
                 propertyIndexMap.put(++propertyToInsertCount, Long.parseLong(studentMcaMarks));
             }
-        }
 
-        String query = studentSqlQuery.toString();
+            String skillString = (String) jsonQuery.get(SKILL_SELECT_FIELD);
+            if (skillString != null) {
+
+            }
+        }
+        studentSqlQuery.append(" ORDER BY id");
         DataSource dataSource = DataSource.getInstance();
         try (Connection connection = dataSource.getConnection()) {
             try (PreparedStatement statement = connection
-                    .prepareStatement(query)) {
-
+                    .prepareStatement(studentSqlQuery.toString())) {
 
                 for (int count = 1; count <= propertyIndexMap.size(); ++count) {
                     Object o = propertyIndexMap.get(count);
@@ -151,14 +156,14 @@ public class StudentDaoImpl implements StudentDao {
                     if (res.next()) {
                         log.error("StudentDaoImpl71");
                         Student stud = new Student();
-                        stud.setId(res.getLong(STUDENT_ID));
-                        stud.setName(res.getString(STUDENT_NAME));
-                        stud.setEmail(res.getString(EMAIL_ID));
-                        stud.setPassword(res.getString(PASSWORD));
-                        stud.setPlaced(res.getBoolean(IS_PLACED));
-                        stud.setSscMark(res.getFloat(SSC_MARKS));
-                        stud.setHscMark(res.getFloat(HSC_MARKS));
-                        stud.setMcaMark(res.getFloat(MCA_MARKS));
+                        stud.setId(res.getLong(STUDENT_ID_COL));
+                        stud.setName(res.getString(STUDENT_NAME_COL));
+                        stud.setEmail(res.getString(EMAIL_ID_COL));
+                        stud.setPassword(res.getString(PASSWORD_COL));
+                        stud.setPlaced(res.getBoolean(IS_PLACED_COL));
+                        stud.setSscMark(res.getFloat(SSC_MARKS_COL));
+                        stud.setHscMark(res.getFloat(HSC_MARKS_COL));
+                        stud.setMcaMark(res.getFloat(MCA_MARKS_COL));
                         studentList.add(stud);
                     }
                     log.error("StudentDaoImpl82");
@@ -188,7 +193,7 @@ public class StudentDaoImpl implements StudentDao {
     public Student getStudentForID(long studentID)
             throws PropertyVetoException, SQLException {
         Student stud = null;
-        String sqlQuery = "SELECT * FROM " + StudentDao.STUDENT_TABLE + " WHERE id = ?";
+        String sqlQuery = "SELECT * FROM " + STUDENT_TABLE + " WHERE id = ?";
 
         DataSource dataSource = DataSource.getInstance();
         try (Connection connection = dataSource.getConnection()) {
@@ -199,14 +204,14 @@ public class StudentDaoImpl implements StudentDao {
                     if (res.next()) {
                         log.error("StudentDaoImpl71");
                         stud = new Student();
-                        stud.setId(res.getLong(STUDENT_ID));
-                        stud.setName(res.getString(STUDENT_NAME));
-                        stud.setEmail(res.getString(EMAIL_ID));
-                        stud.setPassword(res.getString(PASSWORD));
-                        stud.setPlaced(res.getBoolean(IS_PLACED));
-                        stud.setSscMark(res.getFloat(SSC_MARKS));
-                        stud.setHscMark(res.getFloat(HSC_MARKS));
-                        stud.setMcaMark(res.getFloat(MCA_MARKS));
+                        stud.setId(res.getLong(STUDENT_ID_COL));
+                        stud.setName(res.getString(STUDENT_NAME_COL));
+                        stud.setEmail(res.getString(EMAIL_ID_COL));
+                        stud.setPassword(res.getString(PASSWORD_COL));
+                        stud.setPlaced(res.getBoolean(IS_PLACED_COL));
+                        stud.setSscMark(res.getFloat(SSC_MARKS_COL));
+                        stud.setHscMark(res.getFloat(HSC_MARKS_COL));
+                        stud.setMcaMark(res.getFloat(MCA_MARKS_COL));
                     }
                     log.error("StudentDaoImpl82");
                 } catch (SQLException e) {
@@ -240,14 +245,14 @@ public class StudentDaoImpl implements StudentDao {
                 try (ResultSet res = statement.executeQuery(sql)) {
                     while (res.next()) {
                         Student stud = new Student();
-                        stud.setId(res.getLong(STUDENT_ID));
-                        stud.setName(res.getString(STUDENT_NAME));
-                        stud.setEmail(res.getString(EMAIL_ID));
-                        stud.setPassword(res.getString(PASSWORD));
-                        stud.setPlaced(res.getBoolean(IS_PLACED));
-                        stud.setSscMark(res.getFloat(SSC_MARKS));
-                        stud.setHscMark(res.getFloat(HSC_MARKS));
-                        stud.setMcaMark(res.getFloat(MCA_MARKS));
+                        stud.setId(res.getLong(STUDENT_ID_COL));
+                        stud.setName(res.getString(STUDENT_NAME_COL));
+                        stud.setEmail(res.getString(EMAIL_ID_COL));
+                        stud.setPassword(res.getString(PASSWORD_COL));
+                        stud.setPlaced(res.getBoolean(IS_PLACED_COL));
+                        stud.setSscMark(res.getFloat(SSC_MARKS_COL));
+                        stud.setHscMark(res.getFloat(HSC_MARKS_COL));
+                        stud.setMcaMark(res.getFloat(MCA_MARKS_COL));
                         students.add(stud);
                     }
                 }
@@ -282,14 +287,14 @@ public class StudentDaoImpl implements StudentDao {
                 try (ResultSet res = statement.executeQuery()) {
                     while (res.next()) {
                         Student stud = new Student();
-                        stud.setId(res.getLong(STUDENT_ID));
-                        stud.setName(res.getString(STUDENT_NAME));
-                        stud.setEmail(res.getString(EMAIL_ID));
-                        stud.setPassword(res.getString(PASSWORD));
-                        stud.setPlaced(res.getBoolean(IS_PLACED));
-                        stud.setSscMark(res.getFloat(SSC_MARKS));
-                        stud.setHscMark(res.getFloat(HSC_MARKS));
-                        stud.setMcaMark(res.getFloat(MCA_MARKS));
+                        stud.setId(res.getLong(STUDENT_ID_COL));
+                        stud.setName(res.getString(STUDENT_NAME_COL));
+                        stud.setEmail(res.getString(EMAIL_ID_COL));
+                        stud.setPassword(res.getString(PASSWORD_COL));
+                        stud.setPlaced(res.getBoolean(IS_PLACED_COL));
+                        stud.setSscMark(res.getFloat(SSC_MARKS_COL));
+                        stud.setHscMark(res.getFloat(HSC_MARKS_COL));
+                        stud.setMcaMark(res.getFloat(MCA_MARKS_COL));
                         students.add(stud);
                     }
                 }
@@ -312,12 +317,12 @@ public class StudentDaoImpl implements StudentDao {
     @Override
     public void saveStudents(Student... students) throws SQLException,
             PropertyVetoException {
-        String sqlQuery = "INSERT INTO "+ STUDENT_TABLE
+        String sqlQuery = INSERT_INTO + STUDENT_TABLE
                 + " (name, email, password, placed, sscMark, hscmark, mcamark)"
-                + " VALUES (?, ?, ?, ?, ?, ?, ?)";
+                +  VALUES+ "(?, ?, ?, ?, ?, ?, ?)";
 
-        String updateQuery = "UPDATE " + STUDENT_TABLE
-                + " SET "
+        String updateQuery = UPDATE + STUDENT_TABLE
+                + SET
                 + " name = ? , email = ?, password= ?, placed = ?, sscMark = ?, hscmark = ?, mcamark =?";
 
         DataSource dataSource = DataSource.getInstance();
@@ -368,9 +373,9 @@ public class StudentDaoImpl implements StudentDao {
     public List<Skill> getStudentSkills(long studentID) throws SQLException,
             PropertyVetoException {
         List<Skill> skills = new ArrayList<Skill>();
-        String skillQuery = "SELECT * FROM "+ SKILL_TABLE+ WHERE +" id IN ("
-                + "SELECT  skill_id FROM student_skill "
-                + "WHERE  student_id = ?)";
+        String skillQuery = SELECT + "*"+FROM+ SKILL_TABLE + WHERE + SKILL_ID_COL + IN + "("
+                + SELECT + STUDENTSKILL_SKILL_ID_COL + FROM + STUDENT_SKILL_TABLE
+                + WHERE + STUDENTSKILL_STUDENT_ID_COL + "= ?)";
 
         DataSource dataSource = DataSource.getInstance();
         try (Connection connection = dataSource.getConnection()) {
@@ -379,8 +384,8 @@ public class StudentDaoImpl implements StudentDao {
                 statement.setLong(1, studentID);
                 try (ResultSet res = statement.executeQuery()) {
                     while (res.next()) {
-                        Skill skill = new Skill(res.getLong(SKILL_ID),
-                                res.getString(SKILL_NAME));
+                        Skill skill = new Skill(res.getLong(SKILL_ID_COL),
+                                res.getString(SKILL_NAME_COL));
                         skills.add(skill);
                     }
                 }
@@ -402,8 +407,8 @@ public class StudentDaoImpl implements StudentDao {
     @Override
     public void updateSkillsForStudent(Student student, List<Skill> skillsList)
             throws PropertyVetoException, SQLException {
-        String skillsUpdateQuery = "INSERT INTO student_skill "
-                + "(student_id, skill_id) " + "VALUES (?, ?)";
+        String skillsUpdateQuery = INSERT_INTO + STUDENT_SKILL_TABLE
+                + "("+STUDENTSKILL_STUDENT_ID_COL+","+STUDENTSKILL_SKILL_ID_COL+")" + VALUES +"(?, ?)";
         long studentID = student.getId();
 
         DataSource dataSource = DataSource.getInstance();
@@ -462,7 +467,7 @@ public class StudentDaoImpl implements StudentDao {
     }
 
     private void deleteStudent(long studentID, Connection connection) throws SQLException {
-        String deleteQuery = "DELETE FROM " + StudentDao.STUDENT_TABLE + WHERE +" id = ?";
+        String deleteQuery = DELETE_FROM + STUDENT_TABLE + WHERE + STUDENT_ID_COL +" = ?";
         deleteStudentSkills(studentID, connection);
         try (PreparedStatement statement = connection
                 .prepareStatement(deleteQuery)) {
@@ -505,8 +510,8 @@ public class StudentDaoImpl implements StudentDao {
     @Override
     public void deleteStudentSkills(Student student, Skill... skills)
             throws PropertyVetoException, SQLException {
-        String deleteStudentSkillQuery = "DELETE FROM " + StudentDao.STUDENT_SKILL_TABLE + WHERE
-                + STUDENT_SKILL_TABLE_STUDENT_ID + " = ? AND " + STUDENT_SKILL_TABLE_SKILL_ID + " = ?";
+        String deleteStudentSkillQuery = "DELETE FROM " + STUDENT_SKILL_TABLE + WHERE
+                + STUDENTSKILL_STUDENT_ID_COL + " = ? AND " + STUDENTSKILL_SKILL_ID_COL + " = ?";
         long studentID = student.getId();
         DataSource dataSource = DataSource.getInstance();
         try (Connection connection = dataSource.getConnection()) {
@@ -531,7 +536,7 @@ public class StudentDaoImpl implements StudentDao {
     @Override
     public void addSkill(Skill... skills) throws PropertyVetoException,
             SQLException {
-        String insertSkillQuery = "INSERT INTO " + StudentDao.SKILL_TABLE + " (name) VALUES (?)";
+        String insertSkillQuery =  INSERT_INTO + SKILL_TABLE + " (name) "+VALUES+"(?)";
 
         DataSource dataSource = DataSource.getInstance();
         try (Connection connection = dataSource.getConnection()) {
@@ -555,7 +560,7 @@ public class StudentDaoImpl implements StudentDao {
     @Override
     public void deleteSkill(Skill... skills) throws PropertyVetoException,
             SQLException {
-        String insertSkillQuery = "DELETE FROM " + StudentDao.SKILL_TABLE + " WHERE id = ?)";
+        String insertSkillQuery = DELETE_FROM + SKILL_TABLE + WHERE + SKILL_ID_COL +" = ?";
 
         DataSource dataSource = DataSource.getInstance();
         try (Connection connection = dataSource.getConnection()) {
@@ -578,7 +583,7 @@ public class StudentDaoImpl implements StudentDao {
     }
 
     private void cascadeDeleteSkill(long skillID, Connection connection) throws PropertyVetoException, SQLException {
-        String deleteStudentSkill = "DELETE FROM " + StudentDao.STUDENT_SKILL_TABLE + " WHERE skill_id = ?";
+        String deleteStudentSkill = DELETE_FROM + STUDENT_SKILL_TABLE + WHERE + STUDENTSKILL_SKILL_ID_COL +" = ?";
         try (PreparedStatement statement = connection.prepareStatement(deleteStudentSkill)) {
             statement.setLong(1, skillID);
         } catch (SQLException e) {

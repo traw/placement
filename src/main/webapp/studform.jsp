@@ -1,4 +1,5 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8" %>
+<%@ page import="org.in.placementv2.util.JspString" %>
 
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
@@ -20,39 +21,51 @@
                 <div data-spy="affix" data-offset-top="45" data-offset-bottom="90">
                     <ul class="nav" id="sidebar-nav">
                         <li>
-                            <a name="searchstudform.jsp" id="search_student" onclick="getOperation('search_student');"
+                            <a name="search" id="<%= JspString.OP_SEARCH_STUD %>" onclick="getOperation('<%= JspString.OP_SEARCH_STUD %>');"
                                title="Search Student">
                                 Search Student
                             </a>
                         </li>
-                         <li><a href="#">Add Student</a></li>
-                         <li><a href="#">Delete Student</a></li>
-                         <li><a href="#">Get Skill</a></li>
-                         <li><a href="#">Update Skill</a></li>
-                         <li><a href="#">Delete Skill</a></li>
-                         <li><a href="#">View Companies</a></li>
-                         <li><a href="#">Search Companies</a></li>
-                         <li><a href="#">Search Student for company</a></li>
+                        <li>
+                            <a name="addstudent.jsp" id="<%= JspString.OP_ADD_STUD %>" onclick="getOperation('<%= JspString.OP_ADD_STUD %>')"
+                               title="Add Student">
+                                Add Student
+                            </a>
+                        </li>
+                        <li><a href="#">Delete Student</a></li>
+                        <li><a href="#">Get Skill</a></li>
+                        <li><a href="#">Update Skill</a></li>
+                        <li><a href="#">Delete Skill</a></li>
+                        <li><a href="#">View Companies</a></li>
+                        <li>
+                            <a name="search" id="<%= JspString.OP_SEARCH_COMP %>" onclick="getOperation('<%= JspString.OP_SEARCH_COMP %>');"
+                               title="Search Company">
+                                Search Companies
+                            </a>
+                        </li>
+                        <li><a href="#">Search Student for company</a></li>
                     </ul>
                 </div>
             </div>
 
             <!-- main area -->
             <div class="col-xs-9 col-sm-9" data-spy="scroll" data-target="#sidebar-nav">
-                <div name="operationName" id="scratchpad">
-                    <c:import url="searchstudform.jsp"></c:import>
+                <div name="operationName" id="<%= JspString.TOP_PANEL %>">
+                    <%--<c:import url="search.jsp"></c:import>--%>
                 </div>
-                <div name="resultName" id="result_id" class="row hidden"></div>
+                <div name="resultName" id="<%= JspString.BOTTOM_PANEL %>" class="hidden"></div>
             </div>
         </div>
         <!-- /.col-xs-12 main -->
     </div>
     <!--/.row-->
-    <c:import url="inc/footer.jsp"></c:import>
+    <%--<c:import url="inc/footer.jsp"></c:import>--%>
 </div>
-<!--/.container-->
-<c:import url="inc/commonFunction.jsp"></c:import>
-<c:import url="searchstudentform.jsp"></c:import>
-<script type="text/javascript" src="searchstudentform.jsp"></script>
+<!--/.container -->
+
+
+<c:import url="inc/scripts.jsp"></c:import>
+<c:import url="/studentformvalidate.jsp"></c:import>
+<c:import url="/inc/commonFunction.jsp"></c:import>
 </body>
 </html>
