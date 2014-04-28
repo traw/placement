@@ -31,7 +31,7 @@
     }
 %>
 <div class="container">
-    <form role="form" id="<%= JspString.FORM_ADD_EDIT %>" name="<%= JspString.FORM_ADD_EDIT %>">
+    <form role="form" id="<%= obj %>_<%= action %>" name="<%= obj %>_<%= action %>">
         <legend><p class="text-info text-left"><%= legend_placeholder %>
         </p></legend>
         <div class="row form-group">

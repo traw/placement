@@ -33,20 +33,19 @@
 
     String legend_string = null;
 
-    if (paramObj.equals(JspString.OBJ_COMP)) {
-        input_1_Id = JspString.COMPANY_ID;
-        input_2_Id = JspString.SEARCH_STRING;
+    input_1_Id = JspString.ID_FIELD;
+    input_2_Id = JspString.NAME_FIELD;
 
+    if (paramObj.equals(JspString.OBJ_COMP)) {
         input_1_Type = JspString.INPUT_TYPE_TEXT;
         input_2_Type = JspString.INPUT_TYPE_TEXT;
 
         placeHolder_1 = JspString.COMPANY_ID_PLACEHOLDER;
-        placeHolder_2 = JspString.COMPANY_NAME_PLACEHOLDER;
+        placeHolder_2 = JspString.SEARCH_STRING;
 
         legend_string = JspString.LEGEND_SEARCH_COMP;
+
     } else if (paramObj.equals(JspString.OBJ_STUD)) {
-        input_1_Id = JspString.ID_FIELD;
-        input_2_Id = JspString.NAME_FIELD;
         input_3_Id = JspString.EMAIL_ID_FIELD;
         input_4_Id = JspString.SELECT_IS_PLACED_FIELD;
 
@@ -65,6 +64,7 @@
     }
 
     if (paramObj.equals(JspString.OBJ_STUD) || paramObj.equals(JspString.OBJ_COMP)) {
+
         input_5_Id = JspString.SSC_MARKS_FIELD;
         input_5_Type = JspString.INPUT_TYPE_TEXT;
         select_2_Id = JspString.SSC_MARKS_CONDITION_FIELD;

@@ -184,11 +184,15 @@ public class CompanyDAO extends SkillDao implements SQLDilect, JspString {
 
         Map<String, Object> propertyIndexMap = new HashMap<>();
         StringBuffer compSqlQuery = new StringBuffer();
-        compSqlQuery.append(SELECT + "DISTINCT S" + FROM + "Company AS C");
+        compSqlQuery.append(SELECT + "DISTINCT C" + FROM + "Company AS C");
         int jsonQuerySize = jsonQuery.size(), paramCounter = 0;
 
         if (jsonQuery.get(VALIDATED_FIELD) != null) {
             jsonQuery.remove(VALIDATED_FIELD);
+        }
+
+        if(jsonQuery.get(NAME_FIELD) != null) {
+            ++jsonQuerySize;
         }
 
         if (jsonQuerySize > 0) {
@@ -217,11 +221,16 @@ public class CompanyDAO extends SkillDao implements SQLDilect, JspString {
                 ++paramCounter;
             }
 
-            String compName = (String) jsonQuery.get(NAME_FIELD);
-            if (compName != null) {
+            String compSearchString = (String) jsonQuery.get(NAME_FIELD);
+            if (compSearchString != null) {
                 compSqlQuery.append((paramCounter > 0 && paramCounter < jsonQuerySize) ? AND_CONDITION : "")
                         .append("C." + NAME).append(LIKE_CONDITION).append(":"+NAME+" ");
-                propertyIndexMap.put(NAME, compName);
+                propertyIndexMap.put(NAME, "%"+compSearchString+"%");
+                ++paramCounter;
+                // Search company Description
+                compSqlQuery.append((paramCounter > 0 && paramCounter < jsonQuerySize) ? AND_CONDITION : "")
+                        .append("C." + DESCRIPTION).append(LIKE_CONDITION).append(":"+DESCRIPTION+" ");
+                propertyIndexMap.put(DESCRIPTION, "%"+compSearchString+"%");
                 ++paramCounter;
             }
 

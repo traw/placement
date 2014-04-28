@@ -14,30 +14,30 @@ function emptySkillMap(map) {
 function validateForm(obj, act) {
     var retObj = {};
     var ret = true;
-    var idField = '<%= JspString.ID_FIELD %>';
-    var idInput = document.getElementById(idField).value;
     var alertsEle = document.getElementById("alerts");
     alertsEle.empty();
 
+    var idField = '<%= JspString.ID_FIELD %>';
+    var idInput = document.getElementById(idField);
     if (idInput != 'undefined' && idInput != '') {
-        if (isNaN(idInput)) {
+        if (isNaN(idInput.value)) {
             document.getElementById("alerts").innerHTML = "Please Enter valid Number!!!";
             ret = false;
         } else {
-            retObj[idField] = idInput;
+            retObj[idField] = idInput.value;
         }
     }
 
-    var nameField = '<%= JspString.NAME_FIELD %>';
-    var nameVal = document.getElementById(nameField).value;
-    if (act == '<%= JspString.ACTION_ADD %>' && nameVal == '') {
+    var nameStr = '<%= JspString.NAME_FIELD %>';
+    var nameField = document.getElementById(nameStr);
+    if (act == '<%= JspString.ACTION_ADD %>' && nameField.value == '') {
         alertsEle.innerHTML.concat('Student name field cannot be empty');
-        nameVal.focus;
+        nameField.focus;
         ret = false;
-    } else if (act == '<%= JspString.ACTION_SEARCH %>' && nameVal == '') {
-        /*Do nothing */
+    } else if (act == '<%= JspString.ACTION_SEARCH %>' && nameField.value == '') {
+        /* Ignore as in search name field can be empty, So Do nothing */
     } else {
-        retObj[nameField] = nameVal;
+        retObj[nameStr] = nameField;
     }
 
     if (obj == '<%= JspString.OBJ_STUD %>') {
@@ -131,8 +131,15 @@ function validateForm(obj, act) {
     }
 
     if (obj == '<%= JspString.OBJ_COMP %>') {
+
         var descNod = document.getElementById('<%= JspString.COMP_DESCRIPTION %>');
-        if (descNod != 'undefined' || descNod != '') {
+        if (act == '<%= JspString.ACTION_ADD %>' && descNod.value == '') {
+            document.getElementById("alerts").innerHTML.concat("&lt;br/&gt;Please fill Company description");
+            ret = false;
+        } else if (act == '<%= JspString.ACTION_SEARCH %>') {
+            /*Do nothing as Description is not present for searching
+            * instead we can use search string to search for name and description */
+        } else {
             retObj['<%= JspString.COMP_DESCRIPTION %>'] = descNod.value;
         }
     }
@@ -238,14 +245,15 @@ function buildCompanyTable(jsonObject, dispNode) {
 
 }
 
-function buildStudentTable(jsonObject, dispNode) {
-    var studentDivEle = document.createElement('div');
-    studentDivEle.setAttribute("name", "studentTableDiv");
+function buildTable(obj, act, jsonObject, dispNode) {
+    var divEle = document.createElement('div');
+    divEle.setAttribute("name", "studentTableDiv");
 //    studentDivEle.setAttribute("class", "table table-responsive");
-
+    var title = obj == '<%= JspString.OBJ_STUD %>' ? 'Student'
+            : (obj == '<%= JspString.OBJ_COMP %>' ? 'Company' : 'Skill');
     var studTableNod = document.createElement('table');
     studTableNod.setAttribute('class', 'table ');
-    studTableNod.setAttribute('name', 'studentTable');
+    studTableNod.setAttribute('name', obj + 'Table');
 
     var captionNod = document.createElement('caption');
 
@@ -253,7 +261,7 @@ function buildStudentTable(jsonObject, dispNode) {
     h3Ele.setAttribute('align', 'center');
     var captionSpanEle = document.createElement('span');
     captionSpanEle.setAttribute('class', 'label label-primary');
-    captionSpanEle.innerHTML = 'Students<br/>';
+    captionSpanEle.innerHTML = title + '<br/>';
     h3Ele.appendChild(captionSpanEle);
     captionNod.appendChild(h3Ele);
     studTableNod.appendChild(captionNod);
@@ -265,50 +273,50 @@ function buildStudentTable(jsonObject, dispNode) {
     /* Empty StudSkillMap*/
     emptySkillMap(studSkillMap);
 
-    var studentKeysArray = jsonObject['<%= JsonPropertyString.PARAM_KEYS %>'];
-    var studentColumnCounter = studentKeysArray.length;
-    for (var k = 0; k < studentColumnCounter; k++) {
+    var columnNameArray = jsonObject['<%= JsonPropertyString.PARAM_KEYS %>'];
+    var columnCounter = columnNameArray.length;
+    for (var k = 0; k < columnCounter; k++) {
         var tHeadTrTDEle = document.createElement('td');
         tHeadTrTDEle.setAttribute('style', 'text-align: center;');
-        $(tHeadTrTDEle).append('<strong style="color: #195f91">'+studentKeysArray[k]+'</strong>');
+        $(tHeadTrTDEle).append('<strong style="color: #195f91">' + columnNameArray[k] + '</strong>');
         tHeadTrEle.appendChild(tHeadTrTDEle);
     }
     <!-- Adding delete student Column -->
     var deleteEle = document.createElement('td');
-    deleteEle.innerHTML = $(tHeadTrTDEle).append('<strong style="color: #195f91">Delete</strong>');;
+    $(deleteEle).append('<strong style="color: #195f91">Delete</strong>');
     tHeadTrEle.appendChild(deleteEle);
 
     tHeadEle.appendChild(tHeadTrEle);
     studTableNod.appendChild(tHeadEle);
 
-    var studentRowCounter = jsonObject['<%= JsonPropertyString.PARAM_STUDENTS %>'].length;
-    for (var row = 0; row < studentRowCounter; row++) {
+    var rowCounter = jsonObject['<%= JsonPropertyString.PARAM_OBJ %>'].length;
+    for (var row = 0; row < rowCounter; row++) {
         var tableRowEle = document.createElement('tr');
-        var studentRow = jsonObject['<%= JsonPropertyString.PARAM_STUDENTS %>'][row];
-        tableRowEle.setAttribute('studid', studentRow[0]);
+        var row = jsonObject['<%= JsonPropertyString.PARAM_OBJ %>'][row];
+        tableRowEle.setAttribute(obj + 'id', row[0]);
         var column = 0;
-        for (column = 0; column < studentColumnCounter; column++) {
+        for (column = 0; column < columnCounter; column++) {
             var rawTDEle = document.createElement('td');
-            rawTDEle.innerHTML = studentRow[column];
+            rawTDEle.innerHTML = row[column];
             rawTDEle.setAttribute('style', 'text-align: center;');
             tableRowEle.appendChild(rawTDEle);
         }
 
-        studSkillMap[ studentRow[0] ] = studentRow[column];
+        studSkillMap[ row[0] ] = row[column];
 
         var rowTDEle = document.createElement('td');
         $(rowTDEle).append('<button type="button" class="btn btn-xs btn-danger" ' +
                 'id="delete-stud-btn" data-toggle="modal" data-target="#confirmDelete"data-title="Delete User" ' +
                 'data-message="Are you sure you want to delete this Student ?" ' +
-                'onclick="getEditFrom(this)">' +
+                'onclick="getEditFrom(this,&quot;'+obj+'&quot;, &quot;<%= JspString.ACTION_EDIT %>&quot;)">' +
                 '<i class="glyphicon glyphicon-warning-sign glyphicon-align-center"></i>' +
                 '</button>');
         tableRowEle.appendChild(rowTDEle);
         studTableNod.appendChild(tableRowEle);
     }
-    studentDivEle.appendChild(studTableNod);
+    divEle.appendChild(studTableNod);
     dispNode.empty();
-    dispNode.appendChild(studentDivEle);
+    dispNode.appendChild(divEle);
     dispNode.setAttribute('class', 'show');
 }
 
@@ -331,70 +339,65 @@ function deleteTableRaw(button) {
     }
 }
 
-function getEditFrom(button) {
+function getEditFrom(button, obj, act) {
     var selectedRow = button.parentNode.parentNode;
     var rowText = selectedRow.innerText;
     var rowTextArray = rowText.split("\t");
-    $.ajax({
-        type: 'GET',
-        data: {'<%= JsonPropertyString.PARAM_OBJ %>': '<%= JspString.OBJ_STUD %>',
-            '<%=JsonPropertyString.PARAM_TARGET%>': '<%= JspString.LEGEND_EDIT_STUD %>'},
-        url: '<%= request.getContextPath() %>' + '/formedit.jsp',
-        success: function (html) {
-            var targetEle = document.getElementById('<%= JspString.TOP_PANEL %>');
-            targetEle.empty();
-            $(targetEle).append(html);
-            var count = 0;
-            document.getElementById('<%= JspString.ID_FIELD%>').value = rowTextArray[count];
-            document.getElementById('<%= JspString.NAME_FIELD%>').value = rowTextArray[++count];
-            document.getElementById('<%= JspString.SSC_MARKS_FIELD%>').value = rowTextArray[++count];
-            document.getElementById('<%= JspString.HSC_MARKS_FIELD%>').value = rowTextArray[++count];
-            document.getElementById('<%= JspString.MCA_MARKS_FIELD%>').value = rowTextArray[++count];
-            document.getElementById('<%= JspString.IS_PLACED_FIELD%>').checked = rowTextArray[++count];
-            document.getElementById('<%= JspString.EMAIL_ID_FIELD%>').value = rowTextArray[++count];
-            var selectNod = document.getElementById('<%= JspString.SKILL_SELECT_FIELD %>');
-            var skills = studSkillMap [ rowTextArray[0] ];
-            for (var index in skills) {
-                var skillTemp = skills[index];
-                var optionNod = document.createElement('option');
-                optionNod.value = skillTemp['<%= JspString.ID_FIELD %>'];
-                optionNod.text = skillTemp['<%= JspString.NAME_FIELD %>'];
-                selectNod.appendChild(optionNod);
-            }
-            targetEle.setAttribute('class', 'row show');
+    var param = {};
+    param['<%= JsonPropertyString.PARAM_OBJ %>'] = obj;
+    param['<%= JsonPropertyString.PARAM_ACTION %>'] = act;
+
+    $.get('formedit.jsp', param, function(html){
+        console.log("validation.jsp: 350 ==> got html from formedit.jsp");
+        var targetEle = document.getElementById('<%= JspString.TOP_PANEL %>');
+        targetEle.empty();
+        $(targetEle).append(html);
+        var count = 0;
+        document.getElementById('<%= JspString.ID_FIELD%>').value = rowTextArray[count];
+        document.getElementById('<%= JspString.NAME_FIELD%>').value = rowTextArray[++count];
+        document.getElementById('<%= JspString.EMAIL_ID_FIELD%>').value = rowTextArray[++count];
+        document.getElementById('<%= JspString.IS_PLACED_FIELD%>').checked =(rowTextArray[++count] == 'true');
+        document.getElementById('<%= JspString.SSC_MARKS_FIELD%>').value = rowTextArray[++count];
+        document.getElementById('<%= JspString.HSC_MARKS_FIELD%>').value = rowTextArray[++count];
+        document.getElementById('<%= JspString.MCA_MARKS_FIELD%>').value = rowTextArray[++count];
+        var selectNod = document.getElementById('<%= JspString.SKILL_SELECT_FIELD %>');
+        var skills = studSkillMap [ rowTextArray[0] ];
+        for (var index in skills) {
+            var skillTemp = skills[index];
+            var optionNod = document.createElement('option');
+            optionNod.value = skillTemp['<%= JspString.ID_FIELD %>'];
+            optionNod.text = skillTemp['<%= JspString.NAME_FIELD %>'];
+            selectNod.appendChild(optionNod);
         }
-    });
+        targetEle.setAttribute('class', 'row show');
+    }, 'html');
 }
 
 
-function search(param_obj, param_act) {
-    var param = validateForm(param_obj, param_act);
+function search(obj, act) {
+    var param = validateForm(obj, act);
     if (param['validated'] == false) {
         console.log("Form validation failed");
         delete  param;
         return false;
     }
     delete param['<%= JspString.VALIDATED_FIELD %>'];
-    var debug = false;
-    if (debug) {
-        var resultEle = document.getElementById('<%= JspString.BOTTOM_PANEL %>');
-        buildStudentTable(dummyResponse(), resultEle);
-    } else {
-        $.get('SearchStudentsAction.jsp', param, function (resultText) {
-            var alertsNod = document.getElementById('<%= JspString.ALERTS %>');
-            console.log("validate: 380");
-            if (resultText.hasOwnProperty('<%= JsonPropertyString.ERROR %>')) {
-                alertsNod.innerHTML = resultText['<%= JsonPropertyString.ERROR %>'];
-                console.log("validate: 383" + resultText['<%= JsonPropertyString.ERROR %>']);
-                alertsNod.setAttribute('class', 'alert alert-danger show');
-                return;
-            } else {
-                console.log("validate: 383" + resultText['<%= JsonPropertyString.SUCCESS %>']);
-                var bottomPanel = document.getElementById('<%= JspString.BOTTOM_PANEL %>');
-                buildStudentTable(resultText, bottomPanel);
-            }
-        }, 'JSON');
-    }
+    param['<%= JsonPropertyString.PARAM_OBJ %>'] = obj;
+    param['<%= JsonPropertyString.PARAM_ACTION %>'] = act;
+    $.get('searchAction.jsp', param, function (resultText) {
+        var alertsNod = document.getElementById('<%= JspString.ALERTS %>');
+        console.log("validate: 380");
+        if (resultText.hasOwnProperty('<%= JsonPropertyString.ERROR %>')) {
+            alertsNod.innerHTML = resultText['<%= JsonPropertyString.ERROR %>'];
+            console.log("validate: 383" + resultText['<%= JsonPropertyString.ERROR %>']);
+            alertsNod.setAttribute('class', 'alert alert-danger show');
+            return;
+        } else {
+            console.log("validate: 383" + resultText['<%= JsonPropertyString.SUCCESS %>']);
+            var bottomPanel = document.getElementById('<%= JspString.BOTTOM_PANEL %>');
+            buildTable(obj, act, resultText, bottomPanel);
+        }
+    }, 'JSON');
 }
 
 function saveStudOrComp(obj, act) {

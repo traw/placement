@@ -32,7 +32,7 @@ public interface JspString {
     public static final String INPUT_TYPE_EMAIL = "email";
     public static final String INPUT_TYPE_CHECKBOX = "checkbox";
 
-    /* Student fields */
+    /* Form fields */
     static final String ID_FIELD = "Id" ;
     static final String NAME_FIELD = "Name";
     static final String EMAIL_ID_FIELD = "EmailId";
@@ -52,9 +52,8 @@ public interface JspString {
     public static final String EMAIL_ID_PLACEHOLDER = "Email ID";
 
 
-    /* Company fields */
-    public static final String COMPANY_ID = "compID";
-    public static final String SEARCH_STRING = "search_string";
+    /* Form fields for Company */
+    public static final String SEARCH_STRING = "Search String";
     public static final String COMP_DESCRIPTION = "comp_description";
 
     public static final String COMPANY_ID_PLACEHOLDER = "Company ID";
@@ -71,7 +70,7 @@ public interface JspString {
     public static final String LEGEND_EDIT_COMP = "Company Edit Form";
 
 
-    /*Skill label */
+    /* Skill label */
     public static final String LABEL_SKILL_REMOVE = "Select Skills to Remove";
     public static final String LABEL_SKILL_ADD = "Select Skills to Add";
     public static final String LABEL_SKILL_SEARCH = "Select Skills to Search";
