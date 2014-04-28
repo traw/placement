@@ -1,19 +1,14 @@
 <%@include file="inc/taglibs.jsp" %>
-<%@page import="org.slf4j.Logger" %>
-<%@page import="org.slf4j.LoggerFactory" %>
-<%@ page import="java.util.List" %>
-<%@ page import="org.json.simple.JSONObject" %>
-<%@ page import="org.json.simple.JSONArray" %>
-<%@ page import="java.util.Map" %>
-<%@ page import="org.in.placementv2.model.StudentDAO" %>
-<%@ page import="org.in.placementv2.util.JspString" %>
-<%@ page import="org.in.placementv2.model.Student" %>
-<%@ page import="org.in.placementv2.model.Skill" %>
-<%@ page import="java.util.Iterator" %>
-<%@ page import="java.util.regex.Pattern" %>
-<%@ page import="org.json.simple.parser.JSONParser" %>
-<%@ page import="java.util.Set" %>
 <%@ page import="org.in.placementv2.util.JsonPropertyString" %>
+<%@ page import="org.in.placementv2.util.JspString" %>
+<%@ page import="org.json.simple.JSONArray" %>
+<%@ page import="org.json.simple.JSONObject" %>
+<%@ page import="org.slf4j.Logger" %>
+<%@ page import="org.slf4j.LoggerFactory" %>
+<%@ page import="java.util.Iterator" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="org.in.placementv2.model.*" %>
 
 
 <%
@@ -29,33 +24,29 @@
                 jsonQuery.put(entry.getKey(), param);
             }
         }
-        StudentDAO studentDao = new StudentDAO();
+        CompanyDAO companyDAO = new CompanyDAO();
 
-        List<Student> studentList = studentDao.findStudentForJSONQuery(jsonQuery);
-        if (studentList.size() > 0) {
+        List<Company> companyList = companyDAO.findCompanyForJSONQuery(jsonQuery);
+        if (companyList.size() > 0) {
             JSONArray propertyKeysArray = new JSONArray();
             propertyKeysArray.add(JspString.ID_FIELD);
             propertyKeysArray.add(JspString.NAME_FIELD);
-            propertyKeysArray.add(JspString.EMAIL_ID_FIELD);
-            propertyKeysArray.add(JspString.IS_PLACED_FIELD);
             propertyKeysArray.add(JspString.SSC_MARKS_FIELD);
             propertyKeysArray.add(JspString.HSC_MARKS_FIELD);
             propertyKeysArray.add(JspString.MCA_MARKS_FIELD);
             responseJsonObject.put(JsonPropertyString.PARAM_KEYS, propertyKeysArray);
 
             JSONArray studentsJsonArray = new JSONArray();
-            for (Student student : studentList) {
+            for (Company company : companyList) {
                 JSONArray valueArray = new JSONArray();
-                valueArray.add(student.getId());
-                valueArray.add(student.getName());
-                valueArray.add(student.getEmailid());
-                valueArray.add(student.getPlaced());
-                valueArray.add(student.getSscmarks());
-                valueArray.add(student.getHscmarks());
-                valueArray.add(student.getMcamarks());
+                valueArray.add(company.getId());
+                valueArray.add(company.getName());
+                valueArray.add(company.getSscmarks());
+                valueArray.add(company.getHscmarks());
+                valueArray.add(company.getMcamarks());
 
                 JSONArray skillArray = new JSONArray();
-                Iterator<Skill> skillIterator = student.getSkills().iterator();
+                Iterator<Skill> skillIterator = company.getSkills().iterator();
                 while (skillIterator.hasNext()) {
                     JSONObject skillObject = new JSONObject();
                     Skill skill = skillIterator.next();
@@ -67,7 +58,7 @@
                 valueArray.add(skillArray);
                 studentsJsonArray.add(valueArray);
             }
-            responseJsonObject.put(JsonPropertyString.PARAM_STUDENTS, studentsJsonArray);
+            responseJsonObject.put(JsonPropertyString.PARAM_COMP, studentsJsonArray);
         } else {
             responseJsonObject.put(errLabel, "No Student Found");
         }

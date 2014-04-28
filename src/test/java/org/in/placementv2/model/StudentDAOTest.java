@@ -7,10 +7,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import javax.annotation.RegEx;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.junit.Assert.*;
 
@@ -29,7 +29,33 @@ public class StudentDAOTest {
 
     @Test
     public void testSave() throws Exception {
+        Student student = new Student();
+        student.setName("urvashi");
+        student.setEmailid("urvashi@gmail.com");
+        student.setPlaced(true);
+        student.setSscmarks(80f);
+        student.setHscmarks(80f);
+        student.setMcamarks(80f);
 
+        Set studentSet  = new HashSet();
+        studentSet.add(student);
+
+        Skill skill1 = new Skill();
+        skill1.setId(1l);
+        skill1.setStudents(studentSet);
+        Skill skill2 = new Skill();
+        skill2.setId(2l);
+        skill2.setStudents(studentSet);
+        Skill skill3 = new Skill();
+        skill3.setId(3l);
+        skill3.setStudents(studentSet);
+
+        Set<Skill> skillSet = new HashSet<>();
+        skillSet.add(skill1);
+        skillSet.add(skill2);
+        skillSet.add(skill3);
+        student.setSkills(skillSet);
+        studentDAO.save(student);
     }
 
     @Test
@@ -69,7 +95,13 @@ public class StudentDAOTest {
 
     @Test
     public void testFindByEmailid() throws Exception {
-
+        Pattern pattern = Pattern.compile("-?\\d+");
+        String key = "selected_skill[12]";
+        Matcher matcher = pattern.matcher(key);
+        boolean b = matcher.find();
+        if (b) {
+            System.out.println(matcher.group(0));
+        }
     }
 
     @Test
@@ -120,8 +152,7 @@ public class StudentDAOTest {
     @Test
     public void testFindStudentForJSONQuery() throws Exception {
         JSONObject  o = new JSONObject();
-        o.put(JspString.MCA_MARKS_CONDITION_FIELD, "<=");
-        o.put(JspString.MCA_MARKS_FIELD, "60");
+        o.put(JspString.ID_FIELD, "1");
         JSONArray array = new JSONArray();
         array.add(1l);
         array.add(2l);
@@ -129,7 +160,13 @@ public class StudentDAOTest {
         //o.put(JspString.SKILL_SELECT_FIELD, array);
         List<Student> list = studentDAO.findStudentForJSONQuery(o);
         for (Student student : list) {
-            System.out.println(student.getName());
+            StringBuffer buffer = new StringBuffer();
+            buffer.append(student.getName()).append(": ");
+            Iterator<Skill> skillIterator = student.getSkills().iterator();
+            while (skillIterator.hasNext()) {
+                buffer.append(skillIterator.next().getName()).append(", ");
+            }
+            System.out.println(buffer.toString());
         }
         assertNotNull(list);
     }

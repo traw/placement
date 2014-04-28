@@ -29,7 +29,7 @@
         <property name="mcamarks" type="java.lang.Float">
             <column name="mcamarks" precision="8" scale="8" not-null="true" />
         </property>
-        <set name="skills" inverse="true" table="company_skill" schema="public">
+        <set name="skills" table="company_skill" schema="public" lazy="true" cascade="delete" >
             <key>
                 <column name="company_id" not-null="true" />
             </key>

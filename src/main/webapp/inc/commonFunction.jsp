@@ -6,26 +6,34 @@
         $('.selectpicker').selectpicker();
     });
 
-    function emptyNode (node) {
-        while(node.firstChild) {
+    HTMLElement.prototype.empty = function() {
+        var that = this;
+        while (that.hasChildNodes()) {
+            that.removeChild(that.lastChild);
+        }
+    };
+
+    function emptyNode(node) {
+        while (node.hasChildNodes()) {
             node.removeChild(node.firstChild);
         }
     }
 
-    function getOperation(toGetOperation) {
-        var toGetOperationEle = document.getElementById(toGetOperation);
+    function getOperation(page, target_obj, target_action) {
         $.ajax({
             type: 'GET',
-            data : {'<%= JsonPropertyString.PARAM_OPERATION %>' : toGetOperationEle.id},
-            url: '<%= request.getContextPath() %>' +'/'+toGetOperationEle.name+'.jsp',
+            data: {'<%= JsonPropertyString.PARAM_OBJ %>': target_obj,
+            '<%= JsonPropertyString.PARAM_ACTION %>': target_action },
+            url: '<%= request.getContextPath() %>' + '/' + page + '.jsp',
             success: function (html) {
                 var targetEle = document.getElementById('<%= JspString.TOP_PANEL %>');
-                emptyNode(targetEle);
+                targetEle.empty();
+                var bottomPanel = document.getElementById('<%= JspString.BOTTOM_PANEL %>');
+                bottomPanel.empty();
                 $(targetEle).append(html);
                 targetEle.setAttribute('class', 'row show');
             }
         });
-        return false;
-    }
 
+    }
 </script>

@@ -15,8 +15,7 @@ public abstract class AbstractStudent implements java.io.Serializable {
 	private Long id;
 	private String name;
 	private String emailid;
-	private String password;
-	private Boolean placed;
+    private Boolean placed;
 	private Float sscmarks;
 	private Float hscmarks;
 	private Float mcamarks;
@@ -29,25 +28,23 @@ public abstract class AbstractStudent implements java.io.Serializable {
 	}
 
 	/** minimal constructor */
-	public AbstractStudent(String name, String emailid, String password,
-			Boolean placed, Float sscmarks, Float hscmarks, Float mcamarks) {
+	public AbstractStudent(String name, String emailid, Boolean placed, Float sscmarks,
+                           Float hscmarks, Float mcamarks) {
 		this.name = name;
 		this.emailid = emailid;
-		this.password = password;
-		this.placed = placed;
+        this.placed = placed;
 		this.sscmarks = sscmarks;
 		this.hscmarks = hscmarks;
 		this.mcamarks = mcamarks;
 	}
 
 	/** full constructor */
-	public AbstractStudent(String name, String emailid, String password,
+	public AbstractStudent(String name, String emailid,
 			Boolean placed, Float sscmarks, Float hscmarks, Float mcamarks,
 			Set skills) {
 		this.name = name;
 		this.emailid = emailid;
-		this.password = password;
-		this.placed = placed;
+        this.placed = placed;
 		this.sscmarks = sscmarks;
 		this.hscmarks = hscmarks;
 		this.mcamarks = mcamarks;
@@ -80,15 +77,7 @@ public abstract class AbstractStudent implements java.io.Serializable {
 		this.emailid = emailid;
 	}
 
-	public String getPassword() {
-		return this.password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public Boolean getPlaced() {
+    public Boolean getPlaced() {
 		return this.placed;
 	}
 

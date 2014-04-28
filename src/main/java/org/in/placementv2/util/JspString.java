@@ -5,15 +5,27 @@ package org.in.placementv2.util;
  */
 public interface JspString {
 
-    public static final String OP_SEARCH_STUD = "search_stud";
-    public static final String OP_ADD_STUD = "add_stud";
-    public static final String OP_SEARCH_COMP = "search_comp";
-    public static final String OP_DEL_STUD = "del_stud";
-    public static final String OP_ADD_COMP = "add_comp";
-    public static final String OP_DEL_COMP = "del_comp";
+    /* Forms ID's */
+    public static final String FORM_SEARCH = "formsearch";
+    public static final String FORM_ADD_EDIT = "formedit";
+    public static final String FORM_SKILL_ADD = "formskilledit";
 
+    /*Form Operation Object */
+    public static final String OBJ_STUD = "stud";
+    public static final String OBJ_COMP = "comp";
+    public static final String OBJ_SKILL = "skill";
+
+     /* Form operation Action */
+    public static final String ACTION_ADD = "add";
+    public static final String ACTION_EDIT = "edit";
+    public static final String ACTION_SEARCH = "search";
+    public static final String ACTION_DEL = "del";
+
+    /* Form Component*/
     public static final String TOP_PANEL = "top_panel";
     public static final String BOTTOM_PANEL = "bottom_panel";
+
+    public static final String ALERTS = "alerts";
 
     /* Form input types */
     public static final String INPUT_TYPE_TEXT = "text";
@@ -21,7 +33,6 @@ public interface JspString {
     public static final String INPUT_TYPE_CHECKBOX = "checkbox";
 
     /* Student fields */
-
     static final String ID_FIELD = "Id" ;
     static final String NAME_FIELD = "Name";
     static final String EMAIL_ID_FIELD = "EmailId";
@@ -50,10 +61,18 @@ public interface JspString {
     public static final String COMPANY_NAME_PLACEHOLDER = "Company Name";
 
 
-    /* Forms ID's */
-    public static final String SEARCH_FORM = "search_form";
-    public static final String ADD_COMP_STUD_FORM = "add_comp_stud_form";
-    public static final String ADD_SKILL_FORM = "add_skill_form";
+    // Form legend field
+    public static final String LEGEND_SEARCH_STUD = "Student Search Form";
+    public static final String LEGEND_ADD_STUD = "Student Add Form";
+    public static final String LEGEND_EDIT_STUD = "Student Edit Form";
+
+    public static final String LEGEND_SEARCH_COMP = "Company Search Form";
+    public static final String LEGEND_ADD_COMP = "Company Add Form";
+    public static final String LEGEND_EDIT_COMP = "Company Edit Form";
 
 
+    /*Skill label */
+    public static final String LABEL_SKILL_REMOVE = "Select Skills to Remove";
+    public static final String LABEL_SKILL_ADD = "Select Skills to Add";
+    public static final String LABEL_SKILL_SEARCH = "Select Skills to Search";
 }

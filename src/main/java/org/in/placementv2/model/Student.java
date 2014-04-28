@@ -14,16 +14,16 @@ public class Student extends AbstractStudent implements java.io.Serializable {
 	}
 
 	/** minimal constructor */
-	public Student(String name, String emailid, String password,
+	public Student(String name, String emailid,
 			Boolean placed, Float sscmarks, Float hscmarks, Float mcamarks) {
-		super(name, emailid, password, placed, sscmarks, hscmarks, mcamarks);
+		super(name, emailid, placed, sscmarks, hscmarks, mcamarks);
 	}
 
 	/** full constructor */
-	public Student(String name, String emailid, String password,
+	public Student(String name, String emailid,
 			Boolean placed, Float sscmarks, Float hscmarks, Float mcamarks,
 			Set skills) {
-		super(name, emailid, password, placed, sscmarks, hscmarks, mcamarks,
+		super(name, emailid, placed, sscmarks, hscmarks, mcamarks,
 				skills);
 	}
 

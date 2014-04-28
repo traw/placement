@@ -28,7 +28,7 @@ public class SkillDAOTest {
 	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		dao = new SkillDAO();
+
 	}
 
 	/**
@@ -43,6 +43,7 @@ public class SkillDAOTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
+        dao = new SkillDAO();
 	}
 
 	/**
@@ -57,7 +58,9 @@ public class SkillDAOTest {
 	 */
 	@Test
 	public void testSave() {
-		fail("Not yet implemented"); // TODO
+		Skill skill = new Skill();
+        skill.setName("office");
+        assertTrue(dao.save(skill));
 	}
 
 	/**

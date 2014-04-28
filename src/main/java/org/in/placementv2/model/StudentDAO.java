@@ -4,11 +4,15 @@ import java.util.*;
 
 import org.hibernate.LockMode;
 import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Example;
 import org.in.placementv2.dao.SkillDao;
 import org.in.placementv2.util.JspString;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.in.placement.util.SQLDilect;
@@ -30,7 +34,6 @@ public class StudentDAO extends SkillDao implements SQLDilect, JspString {
     public static final String ID = "id";
     public static final String NAME = "name";
     public static final String EMAILID = "emailid";
-    public static final String PASSWORD = "password";
     public static final String PLACED = "placed";
     public static final String SSCMARKS = "sscmarks";
     public static final String HSCMARKS = "hscmarks";
@@ -41,12 +44,20 @@ public class StudentDAO extends SkillDao implements SQLDilect, JspString {
 
     public void save(Student transientInstance) {
         log.debug("saving Student instance");
+        Session session = null;
+        Transaction tx = null;
         try {
-            getSession().save(transientInstance);
+            session = getSession();
+            tx = session.beginTransaction();
+            session.saveOrUpdate(transientInstance);
+            tx.commit();
             log.debug("save successful");
         } catch (RuntimeException re) {
             log.error("save failed", re);
+            tx.rollback();
             throw re;
+        } finally {
+            session.close();
         }
     }
 
@@ -111,10 +122,6 @@ public class StudentDAO extends SkillDao implements SQLDilect, JspString {
         return findByProperty(EMAILID, emailid);
     }
 
-    public List findByPassword(Object password) {
-        return findByProperty(PASSWORD, password);
-    }
-
     public List findByPlaced(Object placed) {
         return findByProperty(PLACED, placed);
     }
@@ -177,7 +184,7 @@ public class StudentDAO extends SkillDao implements SQLDilect, JspString {
         }
     }
 
-    public List findStudentForJSONQuery(JSONObject jsonQuery) {
+    public List findStudentForJSONQuery(JSONObject jsonQuery) throws ParseException {
         log.debug("finding students by query object");
 
         Map<String, Object> propertyIndexMap = new HashMap<>();
@@ -191,13 +198,15 @@ public class StudentDAO extends SkillDao implements SQLDilect, JspString {
 
         if (jsonQuerySize > 0) {
 
-            JSONArray skillsArray = (JSONArray) jsonQuery.get(SKILL_SELECT_FIELD);
-            if (skillsArray != null) {
+            String skillsArrayString = (String) jsonQuery.get(SKILL_SELECT_FIELD);
+            if (skillsArrayString != null && !skillsArrayString.isEmpty()) {
                 //JOIN Stud.skills Sk WHERE Sk.id IN (:ids)";
                 studentSqlQuery.append("JOIN S.skills Sk WHERE Sk.id IN (:" + SKILLS + ") ");
+                JSONParser parser = new JSONParser();
+                JSONArray skillsArray = (JSONArray) parser.parse(skillsArrayString);
                 List<Long> skillIDList = new ArrayList<>();
                 for (int i = 0; i < skillsArray.size(); ++i) {
-                    skillIDList.add((Long) skillsArray.get(i));
+                    skillIDList.add(Long.parseLong((String) skillsArray.get(i)));
                 }
                 propertyIndexMap.put(SKILLS, skillIDList);
                 ++paramCounter;
@@ -266,7 +275,7 @@ public class StudentDAO extends SkillDao implements SQLDilect, JspString {
         }
         studentSqlQuery.append(" ORDER BY S." + NAME);
 
-
+        log.error("StudentDAO:278 = "+ studentSqlQuery.toString());
         try {
             Query query = getSession().createQuery(studentSqlQuery.toString());
 

@@ -6,6 +6,7 @@ import java.util.List;
 import org.hibernate.LockMode;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Example;
 import org.in.placementv2.dao.SkillDao;
 import org.slf4j.Logger;
@@ -27,16 +28,29 @@ public class SkillDAO extends SkillDao {
 	// property constants
 	public static final String NAME = "name";
 
-	public void save(Skill transientInstance) {
+	public boolean save(Skill transientInstance) {
 		log.debug("saving Skill instance");
+        boolean ret = false;
+        Session session = null;
+        Transaction tx = null;
 		try {
-			getSession().save(transientInstance);
+            session = getSession();
+            tx = session.beginTransaction();
+			session.saveOrUpdate(transientInstance);
+            tx.commit();
 			log.debug("save successful");
+            ret = true;
 		} catch (RuntimeException re) {
 			log.error("save failed", re);
+            ret = false;
+            tx.rollback();
 			throw re;
-		}
-	}
+		} finally {
+            session.close();
+            return ret;
+        }
+
+    }
 
 	public void delete(Skill persistentInstance) {
 		log.debug("deleting Skill instance");
@@ -98,7 +112,7 @@ public class SkillDAO extends SkillDao {
 	public List findAll() {
 		log.debug("finding all Skill instances");
 		try {
-			String queryString = "from Skill";
+			String queryString = "from Skill S order by S.name";
 			Query queryObject = getSession().createQuery(queryString);
 			return queryObject.list();
 		} catch (RuntimeException re) {

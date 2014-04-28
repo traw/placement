@@ -7,11 +7,11 @@
 <hibernate-mapping>
     <class name="org.in.placementv2.model.Users" table="users" schema="public">
         <id name="username" type="java.lang.String">
-            <column name="username" length="30" />
+            <column name="username"/>
             <generator class="increment" />
         </id>
         <property name="password" type="java.lang.String">
-            <column name="password" length="30" />
+            <column name="password" />
         </property>
     </class>
 </hibernate-mapping>

@@ -13,7 +13,7 @@
         <property name="name" type="java.lang.String">
             <column name="name" unique="true" />
         </property>
-        <set name="students" inverse="true" table="student_skill" schema="public">
+        <set name="students" inverse="true" table="student_skill" cascade="delete" schema="public">
             <key>
                 <column name="skill_id" not-null="true" />
             </key>
@@ -21,7 +21,7 @@
                 <column name="student_id" not-null="true" />
             </many-to-many>
         </set>
-        <set name="companies" table="company_skill" schema="public">
+        <set name="companies" table="company_skill" cascade="delete" schema="public">
             <key>
                 <column name="skill_id" not-null="true" />
             </key>

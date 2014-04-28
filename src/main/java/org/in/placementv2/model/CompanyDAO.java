@@ -1,11 +1,19 @@
 package org.in.placementv2.model;
 
-import java.util.List;
+import java.util.*;
 
 import org.hibernate.LockMode;
 import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Example;
+import org.in.placement.util.SQLDilect;
 import org.in.placementv2.dao.SkillDao;
+import org.in.placementv2.util.JspString;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,25 +28,37 @@ import org.slf4j.LoggerFactory;
  * @see org.in.placementv2.model.Company
  * @author MyEclipse Persistence Tools
  */
-public class CompanyDAO extends SkillDao {
+public class CompanyDAO extends SkillDao implements SQLDilect, JspString {
 	private static final Logger log = LoggerFactory.getLogger(CompanyDAO.class);
 	// property constants
+    public static final String ID = "id";
 	public static final String NAME = "name";
 	public static final String DESCRIPTION = "description";
 	public static final String SSCMARKS = "sscmarks";
 	public static final String HSCMARKS = "hscmarks";
 	public static final String MCAMARKS = "mcamarks";
 
+    // Query Parameter Strings
+    public static final String SKILLS = "skills";
+
 	public void save(Company transientInstance) {
 		log.debug("saving Company instance");
-		try {
-			getSession().save(transientInstance);
+        Session session = null;
+        Transaction tx = null;
+        try {
+            session = getSession();
+            tx = session.beginTransaction();
+            session.saveOrUpdate(transientInstance);
+            tx.commit();
 			log.debug("save successful");
 		} catch (RuntimeException re) {
 			log.error("save failed", re);
+            tx.rollback();
 			throw re;
-		}
-	}
+		} finally {
+            session.close();
+        }
+    }
 
 	public void delete(Company persistentInstance) {
 		log.debug("deleting Company instance");
@@ -158,4 +178,104 @@ public class CompanyDAO extends SkillDao {
 			throw re;
 		}
 	}
+
+    public List findCompanyForJSONQuery(JSONObject jsonQuery) throws ParseException {
+        log.debug("finding students by query object");
+
+        Map<String, Object> propertyIndexMap = new HashMap<>();
+        StringBuffer compSqlQuery = new StringBuffer();
+        compSqlQuery.append(SELECT + "DISTINCT S" + FROM + "Company AS C");
+        int jsonQuerySize = jsonQuery.size(), paramCounter = 0;
+
+        if (jsonQuery.get(VALIDATED_FIELD) != null) {
+            jsonQuery.remove(VALIDATED_FIELD);
+        }
+
+        if (jsonQuerySize > 0) {
+
+            String skillsArrayString = (String) jsonQuery.get(SKILL_SELECT_FIELD);
+            if (skillsArrayString != null && !skillsArrayString.isEmpty()) {
+                //JOIN Stud.skills Sk WHERE Sk.id IN (:ids)";
+                compSqlQuery.append("JOIN C.skills Sk WHERE Sk.id IN (:" + SKILLS + ") ");
+                JSONParser parser = new JSONParser();
+                JSONArray skillsArray = (JSONArray) parser.parse(skillsArrayString);
+                List<Long> skillIDList = new ArrayList<>();
+                for (int i = 0; i < skillsArray.size(); ++i) {
+                    skillIDList.add(Long.parseLong((String) skillsArray.get(i)));
+                }
+                propertyIndexMap.put(SKILLS, skillIDList);
+                ++paramCounter;
+            } else if (jsonQuerySize > 0){
+                compSqlQuery.append(WHERE);
+            }
+
+            String companyId = (String) jsonQuery.get(ID_FIELD);
+            if (companyId != null) {
+                compSqlQuery.append((paramCounter > 0 && paramCounter < jsonQuerySize) ? " " + AND_CONDITION : "")
+                        .append("C." + ID).append(EQUAL_TO_CONDITION).append(":"+ID+" " );
+                propertyIndexMap.put(ID, Long.parseLong(companyId));
+                ++paramCounter;
+            }
+
+            String compName = (String) jsonQuery.get(NAME_FIELD);
+            if (compName != null) {
+                compSqlQuery.append((paramCounter > 0 && paramCounter < jsonQuerySize) ? AND_CONDITION : "")
+                        .append("C." + NAME).append(LIKE_CONDITION).append(":"+NAME+" ");
+                propertyIndexMap.put(NAME, compName);
+                ++paramCounter;
+            }
+
+            String criteriaSscMarks = (String) jsonQuery.get(SSC_MARKS_FIELD);
+            if (criteriaSscMarks != null) {
+                compSqlQuery.append((paramCounter > 0 && paramCounter < jsonQuerySize) ? AND_CONDITION : "")
+                        .append("C." + SSCMARKS).append((String) jsonQuery.get(SSC_MARKS_CONDITION_FIELD))
+                        .append(":"+SSCMARKS+" ");
+                propertyIndexMap.put(SSCMARKS, Float.parseFloat(criteriaSscMarks));
+                ++paramCounter;
+            }
+
+            String criteriaHscMarks = (String) jsonQuery.get(HSC_MARKS_FIELD);
+            if (criteriaHscMarks != null) {
+                compSqlQuery.append((paramCounter > 0 && paramCounter < jsonQuerySize) ? AND_CONDITION : "")
+                        .append("C." + HSCMARKS).append((String) jsonQuery.get(HSC_MARKS_CONDITION_FIELD))
+                        .append(":"+HSCMARKS+" ");
+                propertyIndexMap.put(HSCMARKS, Float.parseFloat(criteriaHscMarks));
+                ++paramCounter;
+            }
+
+            String criteriaMcaMarks = (String) jsonQuery.get(MCA_MARKS_FIELD);
+            if (criteriaMcaMarks != null) {
+                compSqlQuery.append((paramCounter > 0 && paramCounter < jsonQuerySize) ? AND_CONDITION : "")
+                        .append("C." + MCAMARKS).append((String) jsonQuery.get(MCA_MARKS_CONDITION_FIELD))
+                        .append(" :" + MCAMARKS + " ");
+                propertyIndexMap.put(MCAMARKS, Float.parseFloat(criteriaMcaMarks));
+                ++paramCounter;
+            }
+        }
+        compSqlQuery.append(" ORDER BY C." + NAME);
+
+
+        try {
+            Query query = getSession().createQuery(compSqlQuery.toString());
+
+            for (Map.Entry<String, Object> entry : propertyIndexMap.entrySet()) {
+                Object o = entry.getValue();
+                if (o instanceof List) {
+                    query.setParameterList(SKILLS, (Collection) entry.getValue());
+                } else if (o instanceof String) {
+                    query.setString(entry.getKey(), (String) o);
+                } else if (o instanceof Boolean) {
+                    query.setBoolean(entry.getKey(), (Boolean) o);
+                } else if (o instanceof Long ) {
+                    query.setLong(entry.getKey(), (Long) o);
+                } else if (o instanceof Float) {
+                    query.setFloat(entry.getKey(), (Float) o);
+                }
+            }
+            return query.list();
+        } catch (RuntimeException e) {
+            log.error("Error: " + e.getMessage());
+            throw e;
+        }
+    }
 }

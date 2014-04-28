@@ -3,7 +3,6 @@ CREATE TABLE student
  id bigserial PRIMARY KEY, 
  name varchar(30) NOT NULL,
  emailid varchar(30) NOT NULL,
- password varchar(30) NOT NULL,
  placed boolean NOT NULL,
  sscmarks real NOT NULL,
  hscmarks real NOT NULL,

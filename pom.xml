@@ -167,7 +167,7 @@
                 <executions>
                     <execution>
                         <id>tomcat-undeploy</id>
-                        <phase>install</phase>
+                        <phase>pre-integration-test</phase>
                         <goals>
                             <goal>undeploy</goal>
                         </goals>
@@ -176,7 +176,7 @@
                     </execution>
                     <execution>
                         <id>tomcat-deploy</id>
-                        <phase>install</phase>
+                        <phase>post-integration-test</phase>
                         <goals>
                             <goal>deploy-only</goal>
                         </goals>

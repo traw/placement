@@ -4,7 +4,8 @@
 <%@ page import="java.util.List" %>
 <%@ page import="org.in.placementv2.model.SkillDAO" %>
 <%
-    String operation = request.getParameter(JsonPropertyString.PARAM_OPERATION);
+    String paramObj = request.getParameter(JsonPropertyString.PARAM_OBJ);
+    String paramAction = request.getParameter(JsonPropertyString.PARAM_ACTION);
     String input_1_Id = null;
     String input_2_Id = null;
     String input_3_Id = null;
@@ -30,7 +31,9 @@
     String placeHolder_2 = null;
     String placeHolder_3 = null;
 
-    if (operation.equals(JspString.OP_SEARCH_COMP)) {
+    String legend_string = null;
+
+    if (paramObj.equals(JspString.OBJ_COMP)) {
         input_1_Id = JspString.COMPANY_ID;
         input_2_Id = JspString.SEARCH_STRING;
 
@@ -40,7 +43,8 @@
         placeHolder_1 = JspString.COMPANY_ID_PLACEHOLDER;
         placeHolder_2 = JspString.COMPANY_NAME_PLACEHOLDER;
 
-    } else if (operation.equals(JspString.OP_SEARCH_STUD)) {
+        legend_string = JspString.LEGEND_SEARCH_COMP;
+    } else if (paramObj.equals(JspString.OBJ_STUD)) {
         input_1_Id = JspString.ID_FIELD;
         input_2_Id = JspString.NAME_FIELD;
         input_3_Id = JspString.EMAIL_ID_FIELD;
@@ -56,9 +60,11 @@
 
         select_1_Id = JspString.IS_PLACED_FIELD;
         placeHolder_3 = JspString.EMAIL_ID_PLACEHOLDER;
+
+        legend_string = JspString.LEGEND_SEARCH_STUD;
     }
 
-    if (operation.equals(JspString.OP_SEARCH_STUD) || operation.equals(JspString.OP_SEARCH_COMP)) {
+    if (paramObj.equals(JspString.OBJ_STUD) || paramObj.equals(JspString.OBJ_COMP)) {
         input_5_Id = JspString.SSC_MARKS_FIELD;
         input_5_Type = JspString.INPUT_TYPE_TEXT;
         select_2_Id = JspString.SSC_MARKS_CONDITION_FIELD;
@@ -72,10 +78,8 @@
         select_4_Id = JspString.MCA_MARKS_CONDITION_FIELD;
     }
 %>
-<form class="form" id="<%= JspString.SEARCH_FORM %>" name="<%= JspString.SEARCH_FORM %>" action="" method="post"
-      role="form"
-      onsubmit="return search(this.form);">
-    <legend><p class="text-info text-left">Student Search Form</p></legend>
+<form class="form" id="<%= paramObj %>_<%= paramAction %>" name="<%= paramObj %>_<%= paramAction %>" role="form">
+    <legend><p class="text-info text-left"><%= legend_string %></p></legend>
     <div class="row">
         <div class="col-sm-4">
             <div class="form-group">
@@ -92,7 +96,7 @@
             </div>
         </div>
     </div>
-    <% if (operation.equals(JspString.OP_SEARCH_STUD)) { %>
+    <% if (paramObj.equals(JspString.OBJ_STUD)) { %>
     <div class="row">
         <div class="col-sm-4">
             <div class="form-group">
@@ -179,10 +183,13 @@
         </div>
     </div>
     <div class="row">
+        <div class="col-lg-4">
+            <span class="label label-default" style="font-size: large"><%= JspString.LABEL_SKILL_SEARCH %></span>
+        </div>
         <div class="form-group input-group-sm">
-            <div class="col-sm-6 col-sm-offset-0">
+            <div class="col-sm-4 col-sm-offset-0">
                 <select name="name" id="<%= JspString.SKILL_SELECT_FIELD %>"
-                        class="selectpicker form-control dropupAuto" multiple>
+                        class="selectpicker form-control dropupAuto" multiple data-selected-text-format="count">
                     <%
                         SkillDAO skillDAO = new SkillDAO();
                         List<org.in.placementv2.model.Skill> skillList = skillDAO.findAll();
@@ -194,11 +201,10 @@
                 </select>
             </div>
         </div>
-
     </div>
     <div class="row">
         <div class="col-sm-4">
-            <button type="submit" class="btn center-block bg-primary" style="width: 159px; ">
+            <button type="button" class="btn center-block bg-primary" onclick="search('<%= paramObj %>', '<%= paramAction %>');" style="width: 159px; ">
                 <span>Search</span>
             </button>
         </div>
@@ -209,7 +215,7 @@
         </div>
     </div>
 </form>
-<div id="alerts" class="alert hidden">
+<div id="<%= JspString.ALERTS %>" class="alert hidden">
     <strong>Error Message </strong>
 </div>
 <hr/>
