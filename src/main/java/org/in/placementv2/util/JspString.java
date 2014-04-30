@@ -8,7 +8,6 @@ public interface JspString {
     /* Forms ID's */
     public static final String FORM_SEARCH = "formsearch";
     public static final String FORM_ADD_EDIT = "formedit";
-    public static final String FORM_SKILL_ADD = "formskilledit";
 
     /*Form Operation Object */
     public static final String OBJ_STUD = "stud";
@@ -20,10 +19,15 @@ public interface JspString {
     public static final String ACTION_EDIT = "edit";
     public static final String ACTION_SEARCH = "search";
     public static final String ACTION_DEL = "del";
+    public static final String ACTION_GET_STUD = "getstud";
+    public static final String ACTION_GET_COMP = "getcomp";
+
 
     /* Form Component*/
     public static final String TOP_PANEL = "top_panel";
     public static final String BOTTOM_PANEL = "bottom_panel";
+    public static final String PRIMARY_TABLE = "primary_table";
+    public static final String SECONDARY_TABLE = "secondary_table";
 
     public static final String ALERTS = "alerts";
 
@@ -54,10 +58,14 @@ public interface JspString {
 
     /* Form fields for Company */
     public static final String SEARCH_STRING = "Search String";
-    public static final String COMP_DESCRIPTION = "comp_description";
+    public static final String DESCRIPTION_FIELD = "comp_description";
 
     public static final String COMPANY_ID_PLACEHOLDER = "Company ID";
     public static final String COMPANY_NAME_PLACEHOLDER = "Company Name";
+
+    /* Form fields for skill */
+    public static final String SKILL_ID_PLACEHOLDER = "Skill ID";
+    public static final String SKILL_NAME_PLACEHOLDER = "Skill Name";
 
 
     // Form legend field
@@ -68,6 +76,10 @@ public interface JspString {
     public static final String LEGEND_SEARCH_COMP = "Company Search Form";
     public static final String LEGEND_ADD_COMP = "Company Add Form";
     public static final String LEGEND_EDIT_COMP = "Company Edit Form";
+
+    public static final String LEGEND_SEARCH_SKILL = "Skill Search Form";
+    public static final String LEGEND_ADD_SKILL = "Skill Add Form";
+    public static final String LEGEND_EDIT_SKILL = "Skill Edit Form";
 
 
     /* Skill label */

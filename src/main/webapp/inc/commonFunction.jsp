@@ -28,8 +28,10 @@
             success: function (html) {
                 var targetEle = document.getElementById('<%= JspString.TOP_PANEL %>');
                 targetEle.empty();
-                var bottomPanel = document.getElementById('<%= JspString.BOTTOM_PANEL %>');
-                bottomPanel.empty();
+                var primaryTable = document.getElementById('<%= JspString.PRIMARY_TABLE %>');
+                primaryTable.empty();
+                var secondaryTable = document.getElementById('<%= JspString.SECONDARY_TABLE %>');
+                secondaryTable.empty();
                 $(targetEle).append(html);
                 targetEle.setAttribute('class', 'row show');
             }

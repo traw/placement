@@ -3,6 +3,7 @@
 <%@ page import="org.in.placementv2.util.JspString" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.in.placementv2.model.SkillDAO" %>
+<%@ page import="org.in.placementv2.model.Skill" %>
 <%
     String paramObj = request.getParameter(JsonPropertyString.PARAM_OBJ);
     String paramAction = request.getParameter(JsonPropertyString.PARAM_ACTION);
@@ -61,6 +62,15 @@
         placeHolder_3 = JspString.EMAIL_ID_PLACEHOLDER;
 
         legend_string = JspString.LEGEND_SEARCH_STUD;
+    } else if(paramObj.equals(JspString.OBJ_SKILL)) {
+        input_1_Type = JspString.INPUT_TYPE_TEXT;
+        input_2_Type = JspString.INPUT_TYPE_TEXT;
+
+
+        placeHolder_1 = JspString.SKILL_ID_PLACEHOLDER;
+        placeHolder_2 = JspString.SKILL_NAME_PLACEHOLDER;
+
+        legend_string = JspString.LEGEND_SEARCH_SKILL;
     }
 
     if (paramObj.equals(JspString.OBJ_STUD) || paramObj.equals(JspString.OBJ_COMP)) {
@@ -96,7 +106,8 @@
             </div>
         </div>
     </div>
-    <% if (paramObj.equals(JspString.OBJ_STUD)) { %>
+    <%  if(!paramObj.equals(JspString.OBJ_SKILL)) {
+        if (paramObj.equals(JspString.OBJ_STUD)) { %>
     <div class="row">
         <div class="col-sm-4">
             <div class="form-group">
@@ -192,7 +203,7 @@
                         class="selectpicker form-control dropupAuto" multiple data-selected-text-format="count">
                     <%
                         SkillDAO skillDAO = new SkillDAO();
-                        List<org.in.placementv2.model.Skill> skillList = skillDAO.findAll();
+                        List<Skill> skillList = skillDAO.findAll();
                         for (org.in.placementv2.model.Skill skill : skillList) {
                     %>
                     <option value="<%= skill.getId() %>"><%= skill.getName() %>
@@ -202,9 +213,10 @@
             </div>
         </div>
     </div>
+    <%}%>
     <div class="row">
         <div class="col-sm-4">
-            <button type="button" class="btn center-block bg-primary" onclick="search('<%= paramObj %>', '<%= paramAction %>');" style="width: 159px; ">
+            <button type="button" class="btn center-block bg-primary" onclick="search( '<%= JspString.PRIMARY_TABLE %>','<%= paramObj %>', '<%= paramAction %>');" style="width: 159px; ">
                 <span>Search</span>
             </button>
         </div>

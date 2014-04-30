@@ -1,12 +1,13 @@
 package org.in.placementv2.model;
 
+import java.beans.Expression;
 import java.util.*;
 
-import org.hibernate.LockMode;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.hibernate.*;
+import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Example;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.in.placementv2.dao.SkillDao;
 import org.in.placementv2.util.JspString;
 import org.json.simple.JSONArray;
@@ -50,6 +51,7 @@ public class StudentDAO extends SkillDao implements SQLDilect, JspString {
             session = getSession();
             tx = session.beginTransaction();
             session.saveOrUpdate(transientInstance);
+            session.flush();
             tx.commit();
             log.debug("save successful");
         } catch (RuntimeException re) {
@@ -63,12 +65,21 @@ public class StudentDAO extends SkillDao implements SQLDilect, JspString {
 
     public void delete(Student persistentInstance) {
         log.debug("deleting Student instance");
+        Session session = null;
+        Transaction tx = null;
         try {
-            getSession().delete(persistentInstance);
-            log.debug("delete successful.");
+            session = getSession();
+            tx = session.beginTransaction();
+            session.delete(persistentInstance);
+            session.flush();
+            tx.commit();
+            log.debug("delete successful");
         } catch (RuntimeException re) {
             log.error("delete failed", re);
+            tx.rollback();
             throw re;
+        } finally {
+            session.close();
         }
     }
 
@@ -81,6 +92,144 @@ public class StudentDAO extends SkillDao implements SQLDilect, JspString {
         } catch (RuntimeException re) {
             log.error("get failed", re);
             throw re;
+        }
+    }
+
+
+    public List findByJSONQuery(JSONObject jsonQuery) throws ParseException {
+        log.debug("finding students by query object");
+
+        Map<String, Object> propertyIndexMap = new HashMap<>();
+        StringBuffer studentSqlQuery = new StringBuffer();
+        studentSqlQuery.append(SELECT + "DISTINCT S" + FROM + "Student AS S ");
+        int jsonQuerySize = jsonQuery.size(), paramCounter = 0;
+
+        if (jsonQuery.get(VALIDATED_FIELD) != null) {
+            jsonQuery.remove(VALIDATED_FIELD);
+        }
+
+        if (jsonQuerySize > 0) {
+
+            String skillsArrayString = (String) jsonQuery.get(SKILL_SELECT_FIELD);
+            if (skillsArrayString != null && !skillsArrayString.isEmpty()) {
+                //JOIN Stud.skills Sk WHERE Sk.id IN (:ids)";
+                studentSqlQuery.append("JOIN S.skills Sk WHERE Sk.id IN (:" + SKILLS + ") ");
+                JSONParser parser = new JSONParser();
+                JSONArray skillsArray = (JSONArray) parser.parse(skillsArrayString);
+                List<Long> skillIDList = new ArrayList<>();
+                for (int i = 0; i < skillsArray.size(); ++i) {
+                    skillIDList.add(Long.parseLong((String) skillsArray.get(i)));
+                }
+                propertyIndexMap.put(SKILLS, skillIDList);
+                ++paramCounter;
+            } else if (jsonQuerySize > 0){
+                studentSqlQuery.append(WHERE);
+            }
+
+            String studentId = (String) jsonQuery.get(ID_FIELD);
+            if (studentId != null) {
+                studentSqlQuery.append((paramCounter > 0 && paramCounter < jsonQuerySize) ? " "+ AND_CONDITION : "")
+                        .append("S." + ID).append(EQUAL_TO_CONDITION).append(":"+ID+" " );
+                propertyIndexMap.put(ID, Long.parseLong(studentId));
+                ++paramCounter;
+            }
+
+            String studentName = (String) jsonQuery.get(NAME_FIELD);
+            if (studentName != null) {
+                studentSqlQuery.append( (paramCounter > 0 && paramCounter < jsonQuerySize)  ? AND_CONDITION : "")
+                        .append("S." + NAME).append(LIKE_CONDITION).append(":"+NAME+" ");
+                propertyIndexMap.put(NAME, studentName);
+                ++paramCounter;
+            }
+
+            String studentEmail = (String) jsonQuery.get(EMAIL_ID_FIELD);
+            if (studentEmail != null) {
+                studentSqlQuery.append((paramCounter > 0 && paramCounter < jsonQuerySize)  ? AND_CONDITION : "")
+                        .append("S." + EMAILID).append(LIKE_CONDITION).append(":"+EMAILID+" ");
+                propertyIndexMap.put(EMAILID, studentEmail);
+                ++paramCounter;
+            }
+
+            boolean selectIsPlaced = Boolean.parseBoolean((String) jsonQuery.get(SELECT_IS_PLACED_FIELD));
+            if (selectIsPlaced) {
+                boolean studentIsPlaced = Boolean.parseBoolean((String) jsonQuery.get(IS_PLACED_FIELD));
+                studentSqlQuery.append((paramCounter > 0 && paramCounter < jsonQuerySize) ? AND_CONDITION : "")
+                        .append("S." + PLACED).append(LIKE_CONDITION).append(":"+PLACED+" ");
+                propertyIndexMap.put(PLACED, studentIsPlaced);
+                ++paramCounter;
+            }
+
+            String studentSscMarks = (String) jsonQuery.get(SSC_MARKS_FIELD);
+            if (studentSscMarks != null) {
+                studentSqlQuery.append((paramCounter > 0 && paramCounter < jsonQuerySize) ? AND_CONDITION : "")
+                        .append("S." + SSCMARKS).append((String) jsonQuery.get(SSC_MARKS_CONDITION_FIELD))
+                        .append(":"+SSCMARKS+" ");
+                propertyIndexMap.put(SSCMARKS, Float.parseFloat(studentSscMarks));
+                ++paramCounter;
+            }
+
+            String studentHscMarks = (String) jsonQuery.get(HSC_MARKS_FIELD);
+            if (studentHscMarks != null) {
+                studentSqlQuery.append((paramCounter > 0 && paramCounter < jsonQuerySize) ? AND_CONDITION : "")
+                        .append("S." + HSCMARKS).append((String) jsonQuery.get(HSC_MARKS_CONDITION_FIELD))
+                        .append(":"+HSCMARKS+" ");
+                propertyIndexMap.put(HSCMARKS, Float.parseFloat(studentHscMarks));
+                ++paramCounter;
+            }
+
+            String studentMcaMarks = (String) jsonQuery.get(MCA_MARKS_FIELD);
+            if (studentMcaMarks != null) {
+                studentSqlQuery.append((paramCounter > 0 && paramCounter < jsonQuerySize) ? AND_CONDITION : "").append("S." + MCAMARKS).
+                        append((String) jsonQuery.get(MCA_MARKS_CONDITION_FIELD)).append(" :"+MCAMARKS+" ");
+                propertyIndexMap.put(MCAMARKS, Float.parseFloat(studentMcaMarks));
+                ++paramCounter;
+            }
+        }
+        studentSqlQuery.append(" ORDER BY S." + NAME);
+
+        try {
+            Query query = getSession().createQuery(studentSqlQuery.toString());
+
+            for (Map.Entry<String, Object> entry : propertyIndexMap.entrySet()) {
+                Object o = entry.getValue();
+                if (o instanceof List) {
+                    query.setParameterList(SKILLS, (Collection) entry.getValue());
+                } else if (o instanceof String) {
+                    query.setString(entry.getKey(), (String) o);
+                } else if (o instanceof Boolean) {
+                    query.setBoolean(entry.getKey(), (Boolean) o);
+                } else if (o instanceof Long ) {
+                    query.setLong(entry.getKey(), (Long) o);
+                } else if (o instanceof Float) {
+                    query.setFloat(entry.getKey(), (Float) o);
+                }
+            }
+            return query.list();
+        } catch (RuntimeException e) {
+            log.error("Error: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    public List findCompanies(Long studentId) {
+        log.debug("Finding companies for student ID: " + studentId);
+        try {
+            Student student = findById(studentId);
+            String queryString = "SELECT * from company AS c where c.id IN (" +
+                    "  SELECT cs.company_id from company_skill AS cs WHERE " +
+                    "  cs.skill_id IN ( SELECT ss.skill_id FROM student_skill AS ss WHERE " +
+                    "                   ss.student_id = :studID)) and" +
+                    "  c.sscmarks <= :sscMarks AND c.hscMarks <= :hscMarks AND c.mcaMarks <= :mcaMarks";
+            Query query = getSession().createSQLQuery(queryString).addEntity(Company.class);
+            query.setLong("studID", student.getId());
+            query.setFloat("sscMarks", student.getSscmarks());
+            query.setFloat("hscMarks", student.getHscmarks());
+            query.setFloat("mcaMarks", student.getMcamarks());
+            log.debug("finding companies successful for student id: " + student.getId());
+            return query.list();
+        } catch (RuntimeException e) {
+            log.error("Error: " + e.getMessage());
+            throw e;
         }
     }
 
@@ -181,122 +330,6 @@ public class StudentDAO extends SkillDao implements SQLDilect, JspString {
         } catch (RuntimeException re) {
             log.error("attach failed", re);
             throw re;
-        }
-    }
-
-    public List findStudentForJSONQuery(JSONObject jsonQuery) throws ParseException {
-        log.debug("finding students by query object");
-
-        Map<String, Object> propertyIndexMap = new HashMap<>();
-        StringBuffer studentSqlQuery = new StringBuffer();
-        studentSqlQuery.append(SELECT + "DISTINCT S" + FROM + "Student AS S ");
-        int jsonQuerySize = jsonQuery.size(), paramCounter = 0;
-
-        if (jsonQuery.get(VALIDATED_FIELD) != null) {
-            jsonQuery.remove(VALIDATED_FIELD);
-        }
-
-        if (jsonQuerySize > 0) {
-
-            String skillsArrayString = (String) jsonQuery.get(SKILL_SELECT_FIELD);
-            if (skillsArrayString != null && !skillsArrayString.isEmpty()) {
-                //JOIN Stud.skills Sk WHERE Sk.id IN (:ids)";
-                studentSqlQuery.append("JOIN S.skills Sk WHERE Sk.id IN (:" + SKILLS + ") ");
-                JSONParser parser = new JSONParser();
-                JSONArray skillsArray = (JSONArray) parser.parse(skillsArrayString);
-                List<Long> skillIDList = new ArrayList<>();
-                for (int i = 0; i < skillsArray.size(); ++i) {
-                    skillIDList.add(Long.parseLong((String) skillsArray.get(i)));
-                }
-                propertyIndexMap.put(SKILLS, skillIDList);
-                ++paramCounter;
-            } else if (jsonQuerySize > 0){
-                studentSqlQuery.append(WHERE);
-            }
-
-            String studentId = (String) jsonQuery.get(ID_FIELD);
-            if (studentId != null) {
-                studentSqlQuery.append((paramCounter > 0 && paramCounter < jsonQuerySize) ? " "+ AND_CONDITION : "")
-                        .append("S." + ID).append(EQUAL_TO_CONDITION).append(":"+ID+" " );
-                propertyIndexMap.put(ID, Long.parseLong(studentId));
-                ++paramCounter;
-            }
-
-            String studentName = (String) jsonQuery.get(NAME_FIELD);
-            if (studentName != null) {
-                studentSqlQuery.append( (paramCounter > 0 && paramCounter < jsonQuerySize)  ? AND_CONDITION : "")
-                        .append("S." + NAME).append(LIKE_CONDITION).append(":"+NAME+" ");
-                propertyIndexMap.put(NAME, studentName);
-                ++paramCounter;
-            }
-
-            String studentEmail = (String) jsonQuery.get(EMAIL_ID_FIELD);
-            if (studentEmail != null) {
-                studentSqlQuery.append((paramCounter > 0 && paramCounter < jsonQuerySize)  ? AND_CONDITION : "")
-                        .append("S." + EMAILID).append(LIKE_CONDITION).append(":"+EMAILID+" ");
-                propertyIndexMap.put(EMAILID, studentEmail);
-                ++paramCounter;
-            }
-
-            boolean selectIsPlaced = Boolean.parseBoolean((String) jsonQuery.get(SELECT_IS_PLACED_FIELD));
-            if (selectIsPlaced) {
-                boolean studentIsPlaced = Boolean.parseBoolean((String) jsonQuery.get(IS_PLACED_FIELD));
-                studentSqlQuery.append((paramCounter > 0 && paramCounter < jsonQuerySize) ? AND_CONDITION : "")
-                        .append("S." + PLACED).append(LIKE_CONDITION).append(":"+PLACED+" ");
-                propertyIndexMap.put(PLACED, studentIsPlaced);
-                ++paramCounter;
-            }
-
-            String studentSscMarks = (String) jsonQuery.get(SSC_MARKS_FIELD);
-            if (studentSscMarks != null) {
-                studentSqlQuery.append((paramCounter > 0 && paramCounter < jsonQuerySize) ? AND_CONDITION : "")
-                        .append("S." + SSCMARKS).append((String) jsonQuery.get(SSC_MARKS_CONDITION_FIELD))
-                        .append(":"+SSCMARKS+" ");
-                propertyIndexMap.put(SSCMARKS, Float.parseFloat(studentSscMarks));
-                ++paramCounter;
-            }
-
-            String studentHscMarks = (String) jsonQuery.get(HSC_MARKS_FIELD);
-            if (studentHscMarks != null) {
-                studentSqlQuery.append((paramCounter > 0 && paramCounter < jsonQuerySize) ? AND_CONDITION : "")
-                        .append("S." + HSCMARKS).append((String) jsonQuery.get(HSC_MARKS_CONDITION_FIELD))
-                        .append(":"+HSCMARKS+" ");
-                propertyIndexMap.put(HSCMARKS, Float.parseFloat(studentHscMarks));
-                ++paramCounter;
-            }
-
-            String studentMcaMarks = (String) jsonQuery.get(MCA_MARKS_FIELD);
-            if (studentMcaMarks != null) {
-                studentSqlQuery.append((paramCounter > 0 && paramCounter < jsonQuerySize) ? AND_CONDITION : "").append("S." + MCAMARKS).
-                        append((String) jsonQuery.get(MCA_MARKS_CONDITION_FIELD)).append(" :"+MCAMARKS+" ");
-                propertyIndexMap.put(MCAMARKS, Float.parseFloat(studentMcaMarks));
-                ++paramCounter;
-            }
-        }
-        studentSqlQuery.append(" ORDER BY S." + NAME);
-
-        log.error("StudentDAO:278 = "+ studentSqlQuery.toString());
-        try {
-            Query query = getSession().createQuery(studentSqlQuery.toString());
-
-            for (Map.Entry<String, Object> entry : propertyIndexMap.entrySet()) {
-                Object o = entry.getValue();
-                if (o instanceof List) {
-                    query.setParameterList(SKILLS, (Collection) entry.getValue());
-                } else if (o instanceof String) {
-                    query.setString(entry.getKey(), (String) o);
-                } else if (o instanceof Boolean) {
-                    query.setBoolean(entry.getKey(), (Boolean) o);
-                } else if (o instanceof Long ) {
-                    query.setLong(entry.getKey(), (Long) o);
-                } else if (o instanceof Float) {
-                    query.setFloat(entry.getKey(), (Float) o);
-                }
-            }
-            return query.list();
-        } catch (RuntimeException e) {
-            log.error("Error: " + e.getMessage());
-            throw e;
         }
     }
 }

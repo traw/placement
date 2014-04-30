@@ -21,7 +21,7 @@
                 <div data-spy="affix" data-offset-top="45" data-offset-bottom="90">
                     <ul class="nav nav-tabs" id="sidebar-nav">
                         <li>
-                            <a class="btn btn-small btn-link" name="search" id="<%= JspString.OBJ_STUD %>"
+                            <a class="btn btn-small btn-link" name="nav_<%= JspString.OBJ_STUD %>_<%= JspString.ACTION_SEARCH %>')" id="nav_<%= JspString.OBJ_STUD %>_<%= JspString.ACTION_SEARCH %>')"
                                onclick="getOperation('<%= JspString.FORM_SEARCH %>',
                                        '<%= JspString.OBJ_STUD %>', '<%= JspString.ACTION_SEARCH %>');"
                                title="Search Student">
@@ -29,7 +29,7 @@
                             </a>
                         </li>
                         <li>
-                            <a class="btn btn-small btn-link" name="addstudent.jsp" id="<%= JspString.OBJ_STUD %>"
+                            <a class="btn btn-small btn-link" name="addstudent.jsp" id="nav_<%= JspString.OBJ_STUD %>_<%= JspString.ACTION_ADD %>')"
                                onclick="getOperation('<%= JspString.FORM_ADD_EDIT%>',
                                        '<%= JspString.OBJ_STUD %>', '<%= JspString.ACTION_ADD %>')"
                                title="Add Student">
@@ -37,7 +37,7 @@
                             </a>
                         </li>
                         <li>
-                            <a class="btn btn-small btn-link" name="search" id="<%= JspString.OBJ_COMP %>"
+                            <a class="btn btn-small btn-link" name="nav_<%= JspString.OBJ_COMP %>_<%= JspString.ACTION_SEARCH %>" id="nav_<%= JspString.OBJ_COMP %>_<%= JspString.ACTION_SEARCH %>"
                                onclick="getOperation('<%= JspString.FORM_SEARCH%>',
                                        '<%= JspString.OBJ_COMP %>', '<%= JspString.ACTION_SEARCH %>');"
                                title="Search Company">
@@ -45,18 +45,28 @@
                             </a>
                         </li>
                         <li>
-                            <a class="btn btn-small btn-link" name="add" id="<%= JspString.OBJ_COMP %>"
+                            <a class="btn btn-small btn-link" name="add" id="nav_<%= JspString.OBJ_COMP %>_<%= JspString.ACTION_ADD %>')"
                                onclick="getOperation('<%= JspString.FORM_ADD_EDIT %>',
                                        '<%= JspString.OBJ_COMP %>', '<%= JspString.ACTION_ADD %>');"
                                title="Add Compnay">
                                 Add Company
                             </a>
                         </li>
-                        <li><a class="btn btn-small btn-link" href="#">Get Skill</a></li>
-                        <li><a class="btn btn-small btn-link" href="#">Update Skill</a></li>
-                        <li><a class="btn btn-small btn-link" href="#">Delete Skill</a></li>
-                        <li><a class="btn btn-small btn-link" href="#">View Companies</a></li>
-                        <li><a class="btn btn-small btn-link" href="#">Search Student for company</a></li>
+                        <li><a class="btn btn-small btn-link" name="add" id="nav_<%= JspString.OBJ_SKILL %>_<%= JspString.ACTION_SEARCH %>')"
+                               onclick="getOperation('<%= JspString.FORM_SEARCH %>',
+                                       '<%= JspString.OBJ_SKILL %>', '<%= JspString.ACTION_SEARCH %>');"
+                               title="Search Skill">
+                               Search Skill
+                            </a>
+                        </li>
+                        <li>
+                            <a class="btn btn-small btn-link" name="add" id="nav_<%= JspString.OBJ_SKILL %>_<%= JspString.ACTION_ADD %>')"
+                               onclick="getOperation('<%= JspString.FORM_ADD_EDIT %>',
+                                       '<%= JspString.OBJ_SKILL %>', '<%= JspString.ACTION_ADD %>');"
+                               title="Add Skill">
+                                Add Skill
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -66,7 +76,10 @@
                 <div name="operationName" id="<%= JspString.TOP_PANEL %>">
                     <%--<c:import url="formsearch.jsp"></c:import>--%>
                 </div>
-                <div name="resultName" id="<%= JspString.BOTTOM_PANEL %>" class="hidden"></div>
+                <div name="<%= JspString.BOTTOM_PANEL %>" id="<%= JspString.BOTTOM_PANEL %>">
+                    <div name="<%= JspString.PRIMARY_TABLE %>" id="<%= JspString.PRIMARY_TABLE %>" class="hidden"></div>
+                    <div name="<%= JspString.SECONDARY_TABLE %>" id="<%= JspString.SECONDARY_TABLE %>" class="hidden"></div>
+                </div>
             </div>
         </div>
         <!-- /.col-xs-12 main -->

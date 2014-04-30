@@ -3,47 +3,41 @@
 
 <script type="text/javascript">
 
-var studSkillMap = new Object();
-var compSkillMap = new Object();
-
-function emptySkillMap(map) {
-    for (var key in map) {
-        delete studSkillMap[key];
-    }
-}
 function validateForm(obj, act) {
     var retObj = {};
     var ret = true;
     var alertsEle = document.getElementById("alerts");
     alertsEle.empty();
 
-    var idField = '<%= JspString.ID_FIELD %>';
-    var idInput = document.getElementById(idField);
-    if (idInput != 'undefined' && idInput != '') {
-        if (isNaN(idInput.value)) {
-            document.getElementById("alerts").innerHTML = "Please Enter valid Number!!!";
-            ret = false;
-        } else {
-            retObj[idField] = idInput.value;
-        }
+    var idStr = '<%= JspString.ID_FIELD %>';
+    var idFiels = document.getElementById(idStr);
+    if ((act == '<%= JspString.ACTION_EDIT %>' || act == '<%= JspString.ACTION_DEL %>') && idFiels.value == '') {
+        alertsEle.innerHTML.concat('Id field is empty or invalid ');
+        idFiels.focus;
+        ret = false;
+    } else if ((act == '<%= JspString.ACTION_SEARCH %>' || act == '<%= JspString.ACTION_ADD %>')
+            && idFiels.value == '') {
+        /* Ignore as in search name field can be empty, So Do nothing */
+    } else {
+        retObj[idStr] = idFiels.value;
     }
 
     var nameStr = '<%= JspString.NAME_FIELD %>';
     var nameField = document.getElementById(nameStr);
-    if (act == '<%= JspString.ACTION_ADD %>' && nameField.value == '') {
+    if ((act == '<%= JspString.ACTION_ADD %>' || act == '<%= JspString.ACTION_EDIT %>') && nameField.value == '') {
         alertsEle.innerHTML.concat('Student name field cannot be empty');
         nameField.focus;
         ret = false;
     } else if (act == '<%= JspString.ACTION_SEARCH %>' && nameField.value == '') {
         /* Ignore as in search name field can be empty, So Do nothing */
     } else {
-        retObj[nameStr] = nameField;
+        retObj[nameStr] = nameField.value;
     }
 
     if (obj == '<%= JspString.OBJ_STUD %>') {
         var emailIdField = '<%= JspString.EMAIL_ID_FIELD %>';
         var emailAddress = document.getElementById(emailIdField).value;
-        if (act == '<%= JspString.ACTION_ADD %>' && emailAddress == '') {
+        if ((act == '<%= JspString.ACTION_ADD %>' || act == '<%= JspString.ACTION_EDIT %>') && emailAddress == '') {
             document.getElementById("alerts").innerHTML.concat("&lt;br/&gt;Not a valid e-mail address");
             ret = false;
         } else if (act == '<%= JspString.ACTION_SEARCH%>' && emailAddress == '') {
@@ -58,7 +52,7 @@ function validateForm(obj, act) {
     var isPlacedIsSelected = document.getElementById(selectIsPlacedField);
     if (obj == '<%= JspString.OBJ_STUD %>') {
         if (act == '<%= JspString.ACTION_SEARCH %>' &&
-                (isPlacedIsSelected != 'undefined' && isPlacedIsSelected.checked)) {
+                (isPlacedIsSelected != null && isPlacedIsSelected.checked)) {
             var studentIsPlaced = document.getElementById(isPlacedField).value;
             retObj[isPlacedField] = studentIsPlaced;
         } else if (act == '<%= JspString.ACTION_ADD %>') {
@@ -69,78 +63,84 @@ function validateForm(obj, act) {
 
     var sscMarksField = '<%= JspString.SSC_MARKS_FIELD %>';
     var sscMarksCondStr = '<%= JspString.SSC_MARKS_CONDITION_FIELD %>';
-    var sscMarks = document.getElementById(sscMarksField).value;
+    var sscMarks = document.getElementById(sscMarksField);
     var sscMarksConditionField = document.getElementById(sscMarksCondStr);
-    if (sscMarks != '') {
-        if (isNaN(sscMarks)) {
-            document.getElementById("alerts").innerHTML.concat("&lt;br/&gt;Invalid SSC Marks entered");
-            ret = false;
-        } else {
-            retObj[sscMarksField] = sscMarks;
-        }
-        if (act == '<%= JspString.ACTION_SEARCH %>') {
-            if (sscMarksConditionField = 'undefined' || sscMarksConditionField == '') {
+    if (sscMarks != null && sscMarks.value != '') {
+        if (isNumber(sscMarks.value)) {
+            retObj[sscMarksField] = sscMarks.value;
+            if (act == '<%= JspString.ACTION_SEARCH %>' && sscMarksConditionField.value != '') {
+                retObj[sscMarksCondStr] = sscMarksConditionField.value;
+            } else {
                 document.getElementById("alerts").innerHTML.concat("&lt;br/&gt;Please select SSC Marks Condition");
                 ret = false;
-            } else {
-                retObj[sscMarksCondStr] = sscMarksConditionField.value;
             }
+        } else {
+            document.getElementById("alerts").innerHTML.concat("&lt;br/&gt;Invalid SSC Marks entered");
+            ret = false;
         }
+    }
+    if (act == '<%= JspString.ACTION_ADD %>' || act == '<%= JspString.ACTION_EDIT %>') {
+        document.getElementById("alerts").innerHTML.concat("&lt;br/&gt;Invalid SSC Marks entered");
+        ret = false;
     }
 
     var hscMarksField = '<%= JspString.HSC_MARKS_FIELD %>';
     var hscMarksCondStr = '<%= JspString.HSC_MARKS_CONDITION_FIELD %>';
-    var hscMarks = document.getElementById(hscMarksField).value;
+    var hscMarks = document.getElementById(hscMarksField);
     var hscMarksCondField = document.getElementById(hscMarksCondStr);
-    if (hscMarks != '') {
-        if (isNaN(hscMarks)) {
-            document.getElementById("alerts").innerHTML.concat("&lt;br/&gt;Invalid HSC Marks entered");
-            ret = false;
-        } else {
-            retObj[hscMarksField] = hscMarks;
-        }
-        if (act == '<%= JspString.ACTION_SEARCH %>') {
-            if (hscMarksCondField == 'undefined' || hscMarksCondField == '') {
-                document.getElementById("alerts").innerHTML.concat("&lt;br/&gt;Please select HSC Marks Condition");
-                ret = false;
+    if (hscMarks != null && hscMarks.value != '') {
+        if (isNumber(hscMarks.value)) {
+            retObj[hscMarksField] = hscMarks.value;
+            if (act == '<%= JspString.ACTION_SEARCH %>' && hscMarksCondField.value != '') {
+                retObj[hscMarksCondStr] = hscMarks.value;
             } else {
-                retObj[hscMarksCondStr] = hscMarksCondField;
+                document.getElementById("alerts").innerHTML.concat("&lt;br/&gt;Please select SSC Marks Condition");
+                ret = false;
             }
+        } else {
+            document.getElementById("alerts").innerHTML.concat("&lt;br/&gt;Invalid SSC Marks entered");
+            ret = false;
         }
+    }
+    if (act == '<%= JspString.ACTION_ADD %>' || act == '<%= JspString.ACTION_EDIT %>') {
+        document.getElementById("alerts").innerHTML.concat("&lt;br/&gt;Invalid SSC Marks entered");
+        ret = false;
     }
 
     var mcaMarksField = '<%= JspString.MCA_MARKS_FIELD %>';
     var mcaMarksCondStr = '<%= JspString.MCA_MARKS_CONDITION_FIELD %>';
-    var mcaMarks = document.getElementById(mcaMarksField).value;
+    var mcaMarks = document.getElementById(mcaMarksField);
     var mcaMarksCondField = document.getElementById(mcaMarksCondStr);
-    if (mcaMarks != '') {
-        if (isNaN(mcaMarks)) {
-            document.getElementById("alerts").innerHTML.concat("&lt;br/&gt;Invalid HSC Marks entered");
-            ret = false;
-        } else {
-            retObj[mcaMarksField] = mcaMarks;
-        }
-        if (act == '<%= JspString.ACTION_SEARCH %>') {
-            if (mcaMarksCondField == 'undefined' || mcaMarksCondField == '') {
-                document.getElementById("alerts").innerHTML.concat("&lt;br/&gt;Please select MCA Marks Condition");
-                ret = false;
-            } else {
+    if (mcaMarks != null && mcaMarks.value != '') {
+        if (isNumber(mcaMarks.value)) {
+            retObj[mcaMarksField] = mcaMarks.value;
+            if (act == '<%= JspString.ACTION_SEARCH %>' && mcaMarksCondField.value != '') {
                 retObj[mcaMarksCondStr] = mcaMarksCondField.value;
+            } else {
+                document.getElementById("alerts").innerHTML.concat("&lt;br/&gt;Please select SSC Marks Condition");
+                ret = false;
             }
+        } else {
+            document.getElementById("alerts").innerHTML.concat("&lt;br/&gt;Invalid SSC Marks entered");
+            ret = false;
         }
+    }
+    if (act == '<%= JspString.ACTION_ADD %>' || act == '<%= JspString.ACTION_EDIT %>') {
+        document.getElementById("alerts").innerHTML.concat("&lt;br/&gt;Invalid SSC Marks entered");
+        ret = false;
     }
 
     if (obj == '<%= JspString.OBJ_COMP %>') {
 
-        var descNod = document.getElementById('<%= JspString.COMP_DESCRIPTION %>');
+        var descNod = document.getElementById('<%= JspString.DESCRIPTION_FIELD %>');
         if (act == '<%= JspString.ACTION_ADD %>' && descNod.value == '') {
             document.getElementById("alerts").innerHTML.concat("&lt;br/&gt;Please fill Company description");
             ret = false;
         } else if (act == '<%= JspString.ACTION_SEARCH %>') {
             /*Do nothing as Description is not present for searching
-            * instead we can use search string to search for name and description */
+             * instead we can use search string to search for name and description */
         } else {
-            retObj['<%= JspString.COMP_DESCRIPTION %>'] = descNod.value;
+            retObj['<%= JspString.DESCRIPTION_FIELD %>'] = descNod.value;
         }
     }
 
@@ -162,93 +162,133 @@ function validateForm(obj, act) {
     return retObj;
 }
 
-function dummyResponse() {
-    var keys = ["Student ID", "Name", "Email", "Placed", "SSC Marks", "HSC Marks", "MCA Marks"];
-    var values = [
-        ['1' , 'rajdip', 'r@d.s', 'true', '20', '30', '20']
-    ];
-    var dummyResponse = {};
-    dummyResponse['keys'] = keys;
-    dummyResponse['students'] = values;
-    return dummyResponse;
-}
+function buildPrimaryTable(dispNode, obj, act, jsonObject) {
+    var divNod = document.createElement('div');
+    divNod.setAttribute("name", "tableDiv");
+    var title = obj == '<%= JspString.OBJ_STUD %>' ? 'Student'
+            : (obj == '<%= JspString.OBJ_COMP %>' ? 'Company' : 'Skill');
+    var studTableNod = document.createElement('table');
+    studTableNod.setAttribute('class', 'table table-bordered');
+    studTableNod.setAttribute('name', obj + 'Table');
 
-function buildCompanyTable(jsonObject, dispNode) {
-    var compDivNod = document.createElement('div');
-    compDivNod.setAttribute('name', 'compTableDiv');
+    var captionNod = document.createElement('caption');
 
-    var compTableNod = document.createElement('table');
-    compTableNod.setAttribute('class', 'table table-responsive table-hover table-bordered');
-    compTableNod.setAttribute('name', 'studentTable');
-
-    var captionEle = document.createElement('caption');
-
-    var h3Ele = document.createElement('h3');
-    h3Ele.setAttribute('align', 'center');
+    var h4Ele = document.createElement('h4');
+    h4Ele.setAttribute('align', 'center');
     var captionSpanEle = document.createElement('span');
     captionSpanEle.setAttribute('class', 'label label-primary');
-    captionSpanEle.innerHTML = 'Companies<br/>';
-    h3Ele.appendChild(captionSpanEle);
-    captionEle.appendChild(h3Ele);
-    compTableNod.appendChild(captionEle);
+    captionSpanEle.innerHTML = title + '<br/>';
+    h4Ele.appendChild(captionSpanEle);
+    captionNod.appendChild(h4Ele);
+    studTableNod.appendChild(captionNod);
 
-    var tHead = document.createElement('thead');
-    var tHeadRow = document.createElement('tr');
+    var tHeadEle = document.createElement('thead');
+    var tHeadTrNod = document.createElement('tr');
 
-    var compTableCol = jsonObject['<%= JsonPropertyString.PARAM_KEYS %>'];
-    var colCounter = compTableCol.length;
-    for (var k = 0; k < colCounter; k++) {
-        var tHeadTdNod = document.createElement('td');
-        tHeadTdNod.setAttribute('class', 'text-center');
-        tHeadTdNod.innerHTML = compTableCol[k];
-        tHeadRow.appendChild(tHeadTdNod);
-    }
-    <!-- Adding delete student Column -->
-    var delNod = document.createElement('td');
-    delNod.innerHTML = 'Delete';
-    tHeadRow.appendChild(delNod);
-
-    tHead.appendChild(tHeadRow);
-    compTableNod.appendChild(tHead);
-
-    /* Empty CompSkillMap*/
-    emptySkillMap(compSkillMap);
-
-    var rowCounter = jsonObject['<%= JsonPropertyString.PARAM_COMP %>'].length;
-    for (var row = 0; row < rowCounter; row++) {
-        var rowNod = document.createElement('tr');
-        var compRow = jsonObject['<%= JsonPropertyString.PARAM_COMP %>'][row];
-        rowNod.setAttribute('compid', compRow[0]);
-        var column = 0;
-        for (column = 0; column < colCounter; column++) {
-            var tdNod = document.createElement('td');
-            $(tdNod).append(compRow[column]);
-            rowNod.appendChild(tdNod);
+    var descriptionColumnPosition = -1;
+    var skillPosition = -1;
+    var columnNameArray = jsonObject['<%= JsonPropertyString.PARAM_KEYS %>'];
+    var columnCounter = columnNameArray.length;
+    for (var k = 0; k < columnCounter; k++) {
+        var tHeadTrTDEle = document.createElement('td');
+        tHeadTrTDEle.style.textAlign = 'center';
+        if (columnNameArray[k] == '<%= JspString.SKILL_SELECT_FIELD %>') {
+            skillPosition = k;
+            tHeadTrTDEle.style.display = 'none';
+        } else if (columnNameArray[k] == '<%= JspString.DESCRIPTION_FIELD%>') {
+            descriptionColumnPosition = k;
+            tHeadTrTDEle.style.display = 'none';
         }
+        $(tHeadTrTDEle).append('<strong style="color: #195f91">' + columnNameArray[k] + '</strong>');
+        tHeadTrNod.appendChild(tHeadTrTDEle);
+    }
+    <!-- Adding Edit Column -->
+    var editCol = document.createElement('td');
+    $(editCol).append('<strong style="color: #195f91">Edit</strong>');
+    tHeadTrNod.appendChild(editCol);
 
-        compSkillMap[ compRow[0] ] = compRow[column];
+    <!-- Adding Edit Column -->
+    var delCol = document.createElement('td');
+    $(delCol).append('<strong style="color: #195f91">Delete</strong>');
+    tHeadTrNod.appendChild(delCol);
 
-        var delTDNod = document.createElement('td');
-        $(delTDNod).append('<button type="button" class="btn btn-xs btn-danger" ' +
+    <!-- Adding Get sub objects Column -->
+    var subObjCol = document.createElement('td');
+    var subObjTitle;
+    var subObj;
+    if (obj == '<%= JspString.OBJ_STUD %>' || obj == '<%= JspString.OBJ_SKILL %>') {
+        subObjTitle = 'Companies';
+        subObj = '<%= JspString.ACTION_GET_COMP %>';
+    } else if (obj == '<%= JspString.OBJ_COMP %>') {
+        subObjTitle = 'Students';
+        subObj = '<%= JspString.ACTION_GET_STUD %>';
+    }
+    $(subObjCol).append('<strong style="color: #195f91">' + subObjTitle + '</strong>');
+    tHeadTrNod.appendChild(subObjCol);
+
+    tHeadEle.appendChild(tHeadTrNod);
+    studTableNod.appendChild(tHeadEle);
+
+    var rowCounter = jsonObject['<%= JsonPropertyString.PARAM_OBJ %>'].length;
+    for (var i = 0; i < rowCounter; i++) {
+        var trNod = document.createElement('tr');
+        var row = jsonObject['<%= JsonPropertyString.PARAM_OBJ %>'][i];
+        var column = 0;
+        for (column = 0; column < columnCounter; column++) {
+            var tdNod = document.createElement('td');
+            tdNod.style.textAlign = 'center';
+            if (column == descriptionColumnPosition) {
+                tdNod.style.display = 'none';
+                $(tdNod).append(row[column].replace(/\"([^(\")"]+)\":/g, "$1:"));
+            } else if (column == skillPosition) {
+                tdNod.style.display = 'none';
+                $(tdNod).append(JSON.stringify(row[column]));
+            } else {
+                $(tdNod).append(row[column]);
+            }
+            trNod.appendChild(tdNod);
+        }
+        /* Edit Button for record */
+        var tdEditNod = document.createElement('td');
+        $(tdEditNod).append('<button type="button" class="btn btn-xs btn-danger" ' +
+                'id="delete-stud-btn" data-toggle="modal"' +
+                'onclick="getEditFrom(this,&quot;' + obj + '&quot;, &quot;<%= JspString.ACTION_EDIT %>&quot;)">' +
+                '<i class="glyphicon glyphicon-edit glyphicon-align-center"></i>' +
+                '</button>');
+        trNod.appendChild(tdEditNod);
+
+        /* Delete Button for record */
+        var tdDelNod = document.createElement('td');
+        $(tdDelNod).append('<button type="button" class="btn btn-xs btn-danger" ' +
                 'id="delete-stud-btn" data-toggle="modal" data-target="#confirmDelete"data-title="Delete User" ' +
                 'data-message="Are you sure you want to delete this Student ?" ' +
-                'onclick="getEditFrom(this)">' +
-                '<i class="glyphicon glyphicon-warning-sign glyphicon-align-center"></i>' +
+                'onclick="deleteObject(this,&quot;' + obj + '&quot;, &quot;<%= JspString.ACTION_DEL %>&quot;)">' +
+                '<i class="glyphicon glyphicon-edit glyphicon-align-center"></i>' +
                 '</button>');
-        rowNod.appendChild(delTDNod);
-        compTableNod.appendChild(rowNod);
-    }
-    compDivNod.appendChild(compTableNod);
-    dispNode.empty();
-    dispNode.appendChild(compDivNod);
-    dispNode.setAttribute('class', 'show')
+        trNod.appendChild(tdDelNod);
 
+        /* Get Sub object Button for record */
+        var getSubNod = document.createElement('td');
+        $(getSubNod).append('<button type="button" class="btn btn-xs btn-danger" ' +
+                'id="delete-stud-btn" data-toggle="modal" data-target="#confirmDelete"data-title="Delete User" ' +
+                'data-message="Are you sure you want to delete this Student ?" ' +
+                'onclick="searchSubObject(&quot;' + row[0] + '&quot;,&quot;<%= JspString.SECONDARY_TABLE %>&quot;,&quot;' + obj + '&quot;, &quot;' + subObj + '&quot;)">' +
+                'Get' +
+                '</button>');
+        trNod.appendChild(getSubNod);
+
+        studTableNod.appendChild(trNod);
+    }
+    divNod.appendChild(studTableNod);
+    divNod.appendChild(document.createElement('hr'));
+    dispNode.empty();
+    dispNode.appendChild(divNod);
+    dispNode.setAttribute('class', 'show');
 }
 
-function buildTable(obj, act, jsonObject, dispNode) {
-    var divEle = document.createElement('div');
-    divEle.setAttribute("name", "studentTableDiv");
-//    studentDivEle.setAttribute("class", "table table-responsive");
+function buildSecondaryTable(dispNode, obj, act, jsonObject) {
+    var divNod = document.createElement('div');
+    divNod.setAttribute("name", "tableDiv");
     var title = obj == '<%= JspString.OBJ_STUD %>' ? 'Student'
             : (obj == '<%= JspString.OBJ_COMP %>' ? 'Company' : 'Skill');
     var studTableNod = document.createElement('table');
@@ -270,111 +310,128 @@ function buildTable(obj, act, jsonObject, dispNode) {
     var tHeadTrEle = document.createElement('tr');
     tHeadTrEle.setAttribute('class', 'active');
 
-    /* Empty StudSkillMap*/
-    emptySkillMap(studSkillMap);
-
+    var descriptionColumnPosition = -1;
+    var skillPosition = -1;
     var columnNameArray = jsonObject['<%= JsonPropertyString.PARAM_KEYS %>'];
     var columnCounter = columnNameArray.length;
     for (var k = 0; k < columnCounter; k++) {
         var tHeadTrTDEle = document.createElement('td');
         tHeadTrTDEle.setAttribute('style', 'text-align: center;');
+        if (columnNameArray[k] == '<%= JspString.SKILL_SELECT_FIELD %>') {
+            skillPosition = k;
+            tHeadTrTDEle.style.display = 'none';
+        } else if (columnNameArray[k] == '<%= JspString.DESCRIPTION_FIELD%>') {
+            descriptionColumnPosition = k;
+            tHeadTrTDEle.style.display = 'none';
+        }
         $(tHeadTrTDEle).append('<strong style="color: #195f91">' + columnNameArray[k] + '</strong>');
         tHeadTrEle.appendChild(tHeadTrTDEle);
     }
-    <!-- Adding delete student Column -->
-    var deleteEle = document.createElement('td');
-    $(deleteEle).append('<strong style="color: #195f91">Delete</strong>');
-    tHeadTrEle.appendChild(deleteEle);
 
     tHeadEle.appendChild(tHeadTrEle);
     studTableNod.appendChild(tHeadEle);
 
     var rowCounter = jsonObject['<%= JsonPropertyString.PARAM_OBJ %>'].length;
-    for (var row = 0; row < rowCounter; row++) {
-        var tableRowEle = document.createElement('tr');
-        var row = jsonObject['<%= JsonPropertyString.PARAM_OBJ %>'][row];
-        tableRowEle.setAttribute(obj + 'id', row[0]);
+    for (var i = 0; i < rowCounter; i++) {
+        var trNod = document.createElement('tr');
+        var row = jsonObject['<%= JsonPropertyString.PARAM_OBJ %>'][i];
+        trNod.setAttribute('id', row[0]);
         var column = 0;
         for (column = 0; column < columnCounter; column++) {
-            var rawTDEle = document.createElement('td');
-            rawTDEle.innerHTML = row[column];
-            rawTDEle.setAttribute('style', 'text-align: center;');
-            tableRowEle.appendChild(rawTDEle);
+            var tdNod = document.createElement('td');
+            tdNod.setAttribute('style', 'text-align: center;');
+            if (column == descriptionColumnPosition) {
+                tdNod.style.display = 'none';
+                $(tdNod).append(row[column].replace(/\"([^(\")"]+)\":/g, "$1:"));
+            } else if (column == skillPosition) {
+                tdNod.style.display = 'none';
+                $(tdNod).append(JSON.stringify(row[column]));
+            } else {
+                $(tdNod).append(row[column]);
+            }
+            trNod.appendChild(tdNod);
         }
-
-        studSkillMap[ row[0] ] = row[column];
-
-        var rowTDEle = document.createElement('td');
-        $(rowTDEle).append('<button type="button" class="btn btn-xs btn-danger" ' +
-                'id="delete-stud-btn" data-toggle="modal" data-target="#confirmDelete"data-title="Delete User" ' +
-                'data-message="Are you sure you want to delete this Student ?" ' +
-                'onclick="getEditFrom(this,&quot;'+obj+'&quot;, &quot;<%= JspString.ACTION_EDIT %>&quot;)">' +
-                '<i class="glyphicon glyphicon-warning-sign glyphicon-align-center"></i>' +
-                '</button>');
-        tableRowEle.appendChild(rowTDEle);
-        studTableNod.appendChild(tableRowEle);
+        studTableNod.appendChild(trNod);
     }
-    divEle.appendChild(studTableNod);
+    divNod.appendChild(studTableNod);
+    divNod.appendChild(document.createElement('hr'));
     dispNode.empty();
-    dispNode.appendChild(divEle);
+    dispNode.appendChild(divNod);
     dispNode.setAttribute('class', 'show');
 }
 
-function deleteTableRaw(button) {
-    var rawEle = button.parentNode.parentNode;
-    var studId = rawEle.childNodes[0].innerText;
-    var studentName = rawEle.childNodes[1].innerText;
-    var confirm = window.confirm("Do you Want to delete student:\n" +
-            "Student ID: " + studId +
-            "\nStudent Name: " + studentName);
-    if (confirm == 'true') {
-        $.get({
-            url: deletestud.jsp,
-            data: studId,
-            success: function (response) {
-                alert(response);
+function deleteObject(button, obj, act) {
+    var rowEle = button.parentNode.parentNode;
+    var studId = rowEle.childNodes[0].innerText;
+    var studentName = rowEle.childNodes[1].innerText;
+    var param = {};
+    param['<%= JspString.ID_FIELD %>'] = studId;
+    param['<%= JsonPropertyString.PARAM_OBJ %>'] = obj;
+    param['<%= JsonPropertyString.PARAM_ACTION %>'] = act;
+    var confirm = window.confirm("Do you Want to delete:\n" +
+            "ID: " + studId +
+            "\nName: " + studentName);
+    if (confirm == true) {
+        $.get('SaveAction.jsp', param, function (resultText) {
+            var alertsNod = document.getElementById('<%= JspString.ALERTS %>');
+            if (resultText.hasOwnProperty('<%= JsonPropertyString.SUCCESS %>')) {
+                $(alertsNod).append('Successfully deleted');
+                alertsNod.setAttribute('class', 'alert alert-success show');
+                console.log(resultText['<%= JsonPropertyString.SUCCESS %>']);
+                rowEle.parentNode.removeChild(rowEle);
+            } else if (resultText.hasOwnProperty('<%= JsonPropertyString.ERROR %>')) {
+                $(alertsNod).append(resultText['<%= JsonPropertyString.ERROR %>']);
+                alertsNod.setAttribute('class', 'alert alert-danger show');
+                console.log(resultText['<%= JsonPropertyString.ERROR %>']);
             }
-        }, 'JSON');
-        rawEle.parentNode.removeChild(rawEle);
+        }, 'json');
     }
 }
 
 function getEditFrom(button, obj, act) {
     var selectedRow = button.parentNode.parentNode;
-    var rowText = selectedRow.innerText;
-    var rowTextArray = rowText.split("\t");
     var param = {};
     param['<%= JsonPropertyString.PARAM_OBJ %>'] = obj;
     param['<%= JsonPropertyString.PARAM_ACTION %>'] = act;
-
-    $.get('formedit.jsp', param, function(html){
+    $.get('formedit.jsp', param, function (html) {
         console.log("validation.jsp: 350 ==> got html from formedit.jsp");
         var targetEle = document.getElementById('<%= JspString.TOP_PANEL %>');
         targetEle.empty();
         $(targetEle).append(html);
         var count = 0;
-        document.getElementById('<%= JspString.ID_FIELD%>').value = rowTextArray[count];
-        document.getElementById('<%= JspString.NAME_FIELD%>').value = rowTextArray[++count];
-        document.getElementById('<%= JspString.EMAIL_ID_FIELD%>').value = rowTextArray[++count];
-        document.getElementById('<%= JspString.IS_PLACED_FIELD%>').checked =(rowTextArray[++count] == 'true');
-        document.getElementById('<%= JspString.SSC_MARKS_FIELD%>').value = rowTextArray[++count];
-        document.getElementById('<%= JspString.HSC_MARKS_FIELD%>').value = rowTextArray[++count];
-        document.getElementById('<%= JspString.MCA_MARKS_FIELD%>').value = rowTextArray[++count];
-        var selectNod = document.getElementById('<%= JspString.SKILL_SELECT_FIELD %>');
-        var skills = studSkillMap [ rowTextArray[0] ];
-        for (var index in skills) {
-            var skillTemp = skills[index];
-            var optionNod = document.createElement('option');
-            optionNod.value = skillTemp['<%= JspString.ID_FIELD %>'];
-            optionNod.text = skillTemp['<%= JspString.NAME_FIELD %>'];
-            selectNod.appendChild(optionNod);
+        document.getElementById('<%= JspString.ID_FIELD%>').value = selectedRow.childNodes[count].innerText;
+        document.getElementById('<%= JspString.NAME_FIELD%>').value = selectedRow.childNodes[++count].innerText;
+
+        if (obj == '<%= JspString.OBJ_STUD %>') {
+            document.getElementById('<%= JspString.EMAIL_ID_FIELD%>').value = selectedRow.childNodes[++count].innerText;
+            document.getElementById('<%= JspString.IS_PLACED_FIELD%>').checked = (selectedRow.childNodes[++count].innerText == 'true');
+            document.getElementById('<%= JspString.SSC_MARKS_FIELD%>').value = selectedRow.childNodes[++count].innerText;
+            document.getElementById('<%= JspString.HSC_MARKS_FIELD%>').value = selectedRow.childNodes[++count].innerText;
+            document.getElementById('<%= JspString.MCA_MARKS_FIELD%>').value = selectedRow.childNodes[++count].innerText;
+        } else if (obj == '<%= JspString.OBJ_COMP %>') {
+            document.getElementById('<%= JspString.SSC_MARKS_FIELD%>').value = selectedRow.childNodes[++count].innerText;
+            document.getElementById('<%= JspString.HSC_MARKS_FIELD%>').value = selectedRow.childNodes[++count].innerText;
+            document.getElementById('<%= JspString.MCA_MARKS_FIELD%>').value = selectedRow.childNodes[++count].innerText;
+            document.getElementById('<%= JspString.DESCRIPTION_FIELD%>').value = selectedRow.childNodes[++count].innerText;
+        }
+
+        if (obj == '<%= JspString.OBJ_COMP %>' || obj == '<%= JspString.OBJ_STUD %>') {
+            var selectNod = document.getElementById('<%= JspString.SKILL_SELECT_FIELD %>');
+            var skills = JSON.parse(selectedRow.childNodes[++count].innerText);
+            for (var index in skills) {
+                var skillTemp = skills[index];
+                var optionNod = document.createElement('option');
+                optionNod.value = skillTemp['<%= JspString.ID_FIELD %>'];
+                optionNod.text = skillTemp['<%= JspString.NAME_FIELD %>'];
+                selectNod.appendChild(optionNod);
+            }
         }
         targetEle.setAttribute('class', 'row show');
     }, 'html');
 }
 
 
-function search(obj, act) {
+function search(tableId, obj, act) {
     var param = validateForm(obj, act);
     if (param['validated'] == false) {
         console.log("Form validation failed");
@@ -394,13 +451,43 @@ function search(obj, act) {
             return;
         } else {
             console.log("validate: 383" + resultText['<%= JsonPropertyString.SUCCESS %>']);
-            var bottomPanel = document.getElementById('<%= JspString.BOTTOM_PANEL %>');
-            buildTable(obj, act, resultText, bottomPanel);
+            var table = document.getElementById(tableId);
+            if (tableId == '<%= JspString.PRIMARY_TABLE %>') {
+                buildPrimaryTable(table, obj, act, resultText);
+            } else if (tableId == '<%= JspString.SECONDARY_TABLE %>') {
+                buildSecondaryTable(table, obj, act, resultText);
+            }
         }
     }, 'JSON');
 }
 
-function saveStudOrComp(obj, act) {
+
+function searchSubObject(objId, tableId, obj, act) {
+    var param = {};
+    param['<%= JspString.ID_FIELD %>'] = objId;
+    param['<%= JsonPropertyString.PARAM_OBJ %>'] = obj;
+    param['<%= JsonPropertyString.PARAM_ACTION %>'] = act;
+    $.get('searchAction.jsp', param, function (resultText) {
+        var alertsNod = document.getElementById('<%= JspString.ALERTS %>');
+        console.log("validate: 380");
+        if (resultText.hasOwnProperty('<%= JsonPropertyString.ERROR %>')) {
+            alertsNod.innerHTML = resultText['<%= JsonPropertyString.ERROR %>'];
+            console.log("validate: 383" + resultText['<%= JsonPropertyString.ERROR %>']);
+            alertsNod.setAttribute('class', 'alert alert-danger show');
+            return;
+        } else {
+            console.log("validate: 383" + resultText['<%= JsonPropertyString.SUCCESS %>']);
+            var table = document.getElementById(tableId);
+            if (tableId == '<%= JspString.PRIMARY_TABLE %>') {
+                buildPrimaryTable(table, obj, act, resultText);
+            } else if (tableId == '<%= JspString.SECONDARY_TABLE %>') {
+                buildSecondaryTable(table, resultText['<%= JsonPropertyString.PARAM_TARGET %>'], act, resultText);
+            }
+        }
+    }, 'JSON');
+}
+
+function saveObject(obj, act) {
     var param = validateForm(obj, act);
     if (param['<%= JspString.VALIDATED_FIELD %>'] == false) {
         console.log("Form Validation failed")
@@ -421,7 +508,11 @@ function saveStudOrComp(obj, act) {
             alertsNod.setAttribute('class', 'alert alert-danger show');
             console.log(resultText['<%= JsonPropertyString.ERROR %>']);
         }
-    }, 'JSON');
+    }, 'json');
 }
 
+
+function isNumber(n) {
+    return !isNaN(parseFloat(n)) && isFinite(n);
+}
 </script>

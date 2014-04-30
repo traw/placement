@@ -1,14 +1,19 @@
 package org.in.placementv2.model;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.LockMode;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Example;
+import org.in.placement.util.SQLDilect;
 import org.in.placementv2.dao.SkillDao;
+import org.in.placementv2.util.JspString;
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,9 +28,10 @@ import org.slf4j.LoggerFactory;
  * @see org.in.placementv2.model.Skill
  * @author MyEclipse Persistence Tools
  */
-public class SkillDAO extends SkillDao {
+public class SkillDAO extends SkillDao implements SQLDilect, JspString {
 	private static final Logger log = LoggerFactory.getLogger(SkillDAO.class);
 	// property constants
+    public static final String ID = "id";
 	public static final String NAME = "name";
 
 	public boolean save(Skill transientInstance) {
@@ -37,6 +43,7 @@ public class SkillDAO extends SkillDao {
             session = getSession();
             tx = session.beginTransaction();
 			session.saveOrUpdate(transientInstance);
+            session.flush();
             tx.commit();
 			log.debug("save successful");
             ret = true;
@@ -49,18 +56,26 @@ public class SkillDAO extends SkillDao {
             session.close();
             return ret;
         }
-
     }
 
 	public void delete(Skill persistentInstance) {
 		log.debug("deleting Skill instance");
-		try {
-			getSession().delete(persistentInstance);
-			log.debug("delete successful.");
-		} catch (RuntimeException re) {
-			log.error("delete failed", re);
-			throw re;
-		}
+        Session session = null;
+        Transaction tx = null;
+        try {
+            session = getSession();
+            tx = session.beginTransaction();
+            session.delete(persistentInstance);
+            session.flush();
+            tx.commit();
+            log.debug("delete successful.");
+        } catch (RuntimeException re) {
+            log.error("delete failed", re);
+            tx.rollback();
+            throw re;
+        } finally {
+            session.close();
+        }
 	}
 
 	public Skill findById(java.lang.Long id) {
@@ -74,6 +89,57 @@ public class SkillDAO extends SkillDao {
 			throw re;
 		}
 	}
+
+    public List findByJSONQuery(JSONObject jsonQuery) {
+        log.debug("finding Skills by query object");
+
+        Map<String, Object> propertyIndexMap = new HashMap<>();
+        StringBuffer skillSqlQuery = new StringBuffer();
+        skillSqlQuery.append(SELECT + "DISTINCT S" + FROM + "Skill AS S");
+        int jsonQuerySize = jsonQuery.size(), paramCounter = 0;
+
+        if (jsonQuerySize > 0) {
+            skillSqlQuery.append(WHERE);
+            String companyId = (String) jsonQuery.get(ID_FIELD);
+            if (companyId != null) {
+                skillSqlQuery.append((paramCounter > 0 && paramCounter < jsonQuerySize) ? " " + AND_CONDITION : "")
+                        .append("S." + ID).append(EQUAL_TO_CONDITION).append(":" + ID + " ");
+                propertyIndexMap.put(ID, Long.parseLong(companyId));
+                ++paramCounter;
+            }
+
+            String studentName = (String) jsonQuery.get(NAME_FIELD);
+            if (studentName != null) {
+                skillSqlQuery.append( (paramCounter > 0 && paramCounter < jsonQuerySize)  ? AND_CONDITION : "")
+                        .append("S." + NAME).append(LIKE_CONDITION).append(":"+NAME+" ");
+                propertyIndexMap.put(NAME, studentName);
+                ++paramCounter;
+            }
+        }
+        skillSqlQuery.append(" ORDER BY S." + NAME);
+        log.error("SkillDAO:120 = "+ skillSqlQuery.toString());
+        try {
+            Query query = getSession().createQuery(skillSqlQuery.toString());
+
+            for (Map.Entry<String, Object> entry : propertyIndexMap.entrySet()) {
+                Object o = entry.getValue();
+                 if (o instanceof String) {
+                    query.setString(entry.getKey(), (String) o);
+                } else if (o instanceof Boolean) {
+                    query.setBoolean(entry.getKey(), (Boolean) o);
+                } else if (o instanceof Long ) {
+                    query.setLong(entry.getKey(), (Long) o);
+                } else if (o instanceof Float) {
+                    query.setFloat(entry.getKey(), (Float) o);
+                }
+            }
+            return query.list();
+        } catch (RuntimeException e) {
+            log.error("Error: " + e.getMessage());
+            throw e;
+        }
+
+    }
 
 	public List findByExample(Skill instance) {
 		log.debug("finding Skill instance by example");

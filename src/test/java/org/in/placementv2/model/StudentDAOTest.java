@@ -7,7 +7,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.annotation.RegEx;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -158,7 +157,7 @@ public class StudentDAOTest {
         array.add(2l);
         array.add(3l);
         //o.put(JspString.SKILL_SELECT_FIELD, array);
-        List<Student> list = studentDAO.findStudentForJSONQuery(o);
+        List<Student> list = studentDAO.findByJSONQuery(o);
         for (Student student : list) {
             StringBuffer buffer = new StringBuffer();
             buffer.append(student.getName()).append(": ");
@@ -168,6 +167,24 @@ public class StudentDAOTest {
             }
             System.out.println(buffer.toString());
         }
+        assertNotNull(list);
+    }
+
+    @Test
+    public void testFindCompanies() throws Exception {
+        //StringBuffer buffer = new StringBuffer();
+        List<Company> list = studentDAO.findCompanies(1l);
+        for (Company company : list) {
+            StringBuffer buffer = new StringBuffer();
+            buffer.append(company.getName()).append(": ");
+            Iterator<Skill> skillIterator = company.getSkills().iterator();
+            while (skillIterator.hasNext()) {
+                buffer.append(skillIterator.next().getName()).append(", ");
+            }
+            System.out.println(buffer.toString());
+        }
+
+        //System.out.println(buffer.toString());
         assertNotNull(list);
     }
 }

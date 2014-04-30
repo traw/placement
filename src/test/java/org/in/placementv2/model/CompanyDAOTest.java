@@ -1,19 +1,21 @@
 package org.in.placementv2.model;
 
+import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.*;
 
 public class CompanyDAOTest {
-
+    CompanyDAO dao;
     @Before
     public void setUp() throws Exception {
-
+        dao = new CompanyDAO();
     }
 
     @After
@@ -40,7 +42,7 @@ public class CompanyDAOTest {
             skillSet.add(skill);
         }
         company.setSkills(skillSet);
-        CompanyDAO dao = new CompanyDAO();
+
         dao.save(company);
     }
 
@@ -91,7 +93,8 @@ public class CompanyDAOTest {
 
     @Test
     public void testFindAll() throws Exception {
-
+        List list = dao.findAll();
+        assertNotNull(list);
     }
 
     @Test
@@ -111,6 +114,19 @@ public class CompanyDAOTest {
 
     @Test
     public void testFindCompanyForJSONQuery() throws Exception {
+        JSONObject object = new JSONObject();
+        List  list =  dao.findByJSONQuery(object);
+        assertNotNull(list);
+    }
+    @Test
+    public void testFindStudents() {
+        StringBuffer buffer = new StringBuffer();
+        List<Student> list = dao.findStudents(3l);
+        for (Student student : list) {
+            buffer.append(student.getName()).append(", ");
+        }
 
+        System.out.println(buffer.toString());
+        assertNotNull(list);
     }
 }

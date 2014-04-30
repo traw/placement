@@ -24,174 +24,85 @@ import org.slf4j.LoggerFactory;
  * can be augmented to handle user-managed Spring transactions. Each of these
  * methods provides additional information for how to configure it for the
  * desired type of transaction control.
- * 
- * @see org.in.placementv2.model.Company
+ *
  * @author MyEclipse Persistence Tools
+ * @see org.in.placementv2.model.Company
  */
 public class CompanyDAO extends SkillDao implements SQLDilect, JspString {
-	private static final Logger log = LoggerFactory.getLogger(CompanyDAO.class);
-	// property constants
+    private static final Logger log = LoggerFactory.getLogger(CompanyDAO.class);
+    // property constants
     public static final String ID = "id";
-	public static final String NAME = "name";
-	public static final String DESCRIPTION = "description";
-	public static final String SSCMARKS = "sscmarks";
-	public static final String HSCMARKS = "hscmarks";
-	public static final String MCAMARKS = "mcamarks";
+    public static final String NAME = "name";
+    public static final String DESCRIPTION = "description";
+    public static final String SSCMARKS = "sscmarks";
+    public static final String HSCMARKS = "hscmarks";
+    public static final String MCAMARKS = "mcamarks";
 
     // Query Parameter Strings
     public static final String SKILLS = "skills";
 
-	public void save(Company transientInstance) {
-		log.debug("saving Company instance");
+    public void save(Company transientInstance) {
+        log.debug("saving Company instance");
         Session session = null;
         Transaction tx = null;
         try {
             session = getSession();
             tx = session.beginTransaction();
             session.saveOrUpdate(transientInstance);
+            session.flush();
             tx.commit();
-			log.debug("save successful");
-		} catch (RuntimeException re) {
-			log.error("save failed", re);
+            log.debug("save successful");
+        } catch (RuntimeException re) {
+            log.error("save failed", re);
             tx.rollback();
-			throw re;
-		} finally {
+            throw re;
+        } finally {
             session.close();
         }
     }
 
-	public void delete(Company persistentInstance) {
-		log.debug("deleting Company instance");
-		try {
-			getSession().delete(persistentInstance);
-			log.debug("delete successful");
-		} catch (RuntimeException re) {
-			log.error("delete failed", re);
-			throw re;
-		}
-	}
+    public void delete(Company persistentInstance) {
+        log.debug("deleting Company instance");
+        Session session = null;
+        Transaction tx = null;
+        try {
+            session = getSession();
+            tx = session.beginTransaction();
+            session.delete(persistentInstance);
+            session.flush();
+            tx.commit();
+            log.debug("delete successful");
+        } catch (RuntimeException re) {
+            log.error("delete failed", re);
+            tx.rollback();
+            throw re;
+        } finally {
+            session.close();
+        }
+    }
 
-	public Company findById(java.lang.Long id) {
-		log.debug("getting Company instance with id: " + id);
-		try {
-			Company instance = (Company) getSession().get(
-					"org.in.placementv2.model.Company", id);
-			return instance;
-		} catch (RuntimeException re) {
-			log.error("get failed", re);
-			throw re;
-		}
-	}
+    public Company findById(java.lang.Long id) {
+        log.debug("getting Company instance with id: " + id);
+        try {
+            Company instance = (Company) getSession().get(
+                    "org.in.placementv2.model.Company", id);
+            return instance;
+        } catch (RuntimeException re) {
+            log.error("get failed", re);
+            throw re;
+        }
+    }
 
-	public List findByExample(Company instance) {
-		log.debug("finding Company instance by example");
-		try {
-			List results = getSession()
-					.createCriteria("org.in.placementv2.model.Company")
-					.add(Example.create(instance)).list();
-			log.debug("find by example successful, result size: "
-					+ results.size());
-			return results;
-		} catch (RuntimeException re) {
-			log.error("find by example failed", re);
-			throw re;
-		}
-	}
-
-	public List findByProperty(String propertyName, Object value) {
-		log.debug("finding Company instance with property: " + propertyName
-				+ ", value: " + value);
-		try {
-			String queryString = "from Company as model where model."
-					+ propertyName + "= ?";
-			Query queryObject = getSession().createQuery(queryString);
-			queryObject.setParameter(0, value);
-			return queryObject.list();
-		} catch (RuntimeException re) {
-			log.error("find by property name failed", re);
-			throw re;
-		}
-	}
-
-	public List findByName(Object name) {
-		return findByProperty(NAME, name);
-	}
-
-	public List findByDescription(Object description) {
-		return findByProperty(DESCRIPTION, description);
-	}
-
-	public List findBySscmarks(Object sscmarks) {
-		return findByProperty(SSCMARKS, sscmarks);
-	}
-
-	public List findByHscmarks(Object hscmarks) {
-		return findByProperty(HSCMARKS, hscmarks);
-	}
-
-	public List findByMcamarks(Object mcamarks) {
-		return findByProperty(MCAMARKS, mcamarks);
-	}
-
-	public List findAll() {
-		log.debug("finding all Company instances");
-		try {
-			String queryString = "from Company";
-			Query queryObject = getSession().createQuery(queryString);
-			return queryObject.list();
-		} catch (RuntimeException re) {
-			log.error("find all failed", re);
-			throw re;
-		}
-	}
-
-	public Company merge(Company detachedInstance) {
-		log.debug("merging Company instance");
-		try {
-			Company result = (Company) getSession().merge(detachedInstance);
-			log.debug("merge successful");
-			return result;
-		} catch (RuntimeException re) {
-			log.error("merge failed", re);
-			throw re;
-		}
-	}
-
-	public void attachDirty(Company instance) {
-		log.debug("attaching dirty Company instance");
-		try {
-			getSession().saveOrUpdate(instance);
-			log.debug("attach successful");
-		} catch (RuntimeException re) {
-			log.error("attach failed", re);
-			throw re;
-		}
-	}
-
-	public void attachClean(Company instance) {
-		log.debug("attaching clean Company instance");
-		try {
-			getSession().lock(instance, LockMode.NONE);
-			log.debug("attach successful");
-		} catch (RuntimeException re) {
-			log.error("attach failed", re);
-			throw re;
-		}
-	}
-
-    public List findCompanyForJSONQuery(JSONObject jsonQuery) throws ParseException {
-        log.debug("finding students by query object");
+    public List findByJSONQuery(JSONObject jsonQuery) throws ParseException {
+        log.debug("finding companies by query object");
 
         Map<String, Object> propertyIndexMap = new HashMap<>();
         StringBuffer compSqlQuery = new StringBuffer();
         compSqlQuery.append(SELECT + "DISTINCT C" + FROM + "Company AS C");
         int jsonQuerySize = jsonQuery.size(), paramCounter = 0;
 
-        if (jsonQuery.get(VALIDATED_FIELD) != null) {
-            jsonQuery.remove(VALIDATED_FIELD);
-        }
 
-        if(jsonQuery.get(NAME_FIELD) != null) {
+        if (jsonQuery.get(NAME_FIELD) != null) {
             ++jsonQuerySize;
         }
 
@@ -209,14 +120,14 @@ public class CompanyDAO extends SkillDao implements SQLDilect, JspString {
                 }
                 propertyIndexMap.put(SKILLS, skillIDList);
                 ++paramCounter;
-            } else if (jsonQuerySize > 0){
+            } else if (jsonQuerySize > 0) {
                 compSqlQuery.append(WHERE);
             }
 
             String companyId = (String) jsonQuery.get(ID_FIELD);
             if (companyId != null) {
                 compSqlQuery.append((paramCounter > 0 && paramCounter < jsonQuerySize) ? " " + AND_CONDITION : "")
-                        .append("C." + ID).append(EQUAL_TO_CONDITION).append(":"+ID+" " );
+                        .append("C." + ID).append(EQUAL_TO_CONDITION).append(":" + ID + " ");
                 propertyIndexMap.put(ID, Long.parseLong(companyId));
                 ++paramCounter;
             }
@@ -224,13 +135,13 @@ public class CompanyDAO extends SkillDao implements SQLDilect, JspString {
             String compSearchString = (String) jsonQuery.get(NAME_FIELD);
             if (compSearchString != null) {
                 compSqlQuery.append((paramCounter > 0 && paramCounter < jsonQuerySize) ? AND_CONDITION : "")
-                        .append("C." + NAME).append(LIKE_CONDITION).append(":"+NAME+" ");
-                propertyIndexMap.put(NAME, "%"+compSearchString+"%");
+                        .append("C." + NAME).append(LIKE_CONDITION).append(":" + NAME + " ");
+                propertyIndexMap.put(NAME, "%" + compSearchString + "%");
                 ++paramCounter;
                 // Search company Description
                 compSqlQuery.append((paramCounter > 0 && paramCounter < jsonQuerySize) ? AND_CONDITION : "")
-                        .append("C." + DESCRIPTION).append(LIKE_CONDITION).append(":"+DESCRIPTION+" ");
-                propertyIndexMap.put(DESCRIPTION, "%"+compSearchString+"%");
+                        .append("C." + DESCRIPTION).append(LIKE_CONDITION).append(":" + DESCRIPTION + " ");
+                propertyIndexMap.put(DESCRIPTION, "%" + compSearchString + "%");
                 ++paramCounter;
             }
 
@@ -238,7 +149,7 @@ public class CompanyDAO extends SkillDao implements SQLDilect, JspString {
             if (criteriaSscMarks != null) {
                 compSqlQuery.append((paramCounter > 0 && paramCounter < jsonQuerySize) ? AND_CONDITION : "")
                         .append("C." + SSCMARKS).append((String) jsonQuery.get(SSC_MARKS_CONDITION_FIELD))
-                        .append(":"+SSCMARKS+" ");
+                        .append(":" + SSCMARKS + " ");
                 propertyIndexMap.put(SSCMARKS, Float.parseFloat(criteriaSscMarks));
                 ++paramCounter;
             }
@@ -247,7 +158,7 @@ public class CompanyDAO extends SkillDao implements SQLDilect, JspString {
             if (criteriaHscMarks != null) {
                 compSqlQuery.append((paramCounter > 0 && paramCounter < jsonQuerySize) ? AND_CONDITION : "")
                         .append("C." + HSCMARKS).append((String) jsonQuery.get(HSC_MARKS_CONDITION_FIELD))
-                        .append(":"+HSCMARKS+" ");
+                        .append(":" + HSCMARKS + " ");
                 propertyIndexMap.put(HSCMARKS, Float.parseFloat(criteriaHscMarks));
                 ++paramCounter;
             }
@@ -275,7 +186,7 @@ public class CompanyDAO extends SkillDao implements SQLDilect, JspString {
                     query.setString(entry.getKey(), (String) o);
                 } else if (o instanceof Boolean) {
                     query.setBoolean(entry.getKey(), (Boolean) o);
-                } else if (o instanceof Long ) {
+                } else if (o instanceof Long) {
                     query.setLong(entry.getKey(), (Long) o);
                 } else if (o instanceof Float) {
                     query.setFloat(entry.getKey(), (Float) o);
@@ -287,4 +198,134 @@ public class CompanyDAO extends SkillDao implements SQLDilect, JspString {
             throw e;
         }
     }
+
+    public List findStudents(Long companyId) {
+        log.debug("Getting Student for student ID: " + companyId);
+        try {
+            Company company = findById(companyId);
+            String queryString = "SELECT * from student AS s where s.id IN (" +
+                    "  SELECT ss.student_id from student_skill AS ss WHERE " +
+                    "  ss.skill_id IN ( SELECT cs.skill_id FROM company_skill AS cs WHERE " +
+                    "                   ss.company_id = :compID)) and" +
+                    "  s.sscmarks >= :sscMarks AND s.hscMarks >= :hscMarks AND s.mcaMarks >= :mcaMarks";
+            Query query = getSession().createSQLQuery(queryString).addEntity(Student.class);
+            query.setLong("compID", company.getId());
+            query.setFloat("sscMarks", company.getSscmarks());
+            query.setFloat("hscMarks", company.getHscmarks());
+            query.setFloat("mcaMarks", company.getMcamarks());
+            log.debug("finding students successful for company id: " + company.getId());
+            return query.list();
+        } catch (RuntimeException e) {
+            log.error("Error: " + e.getMessage());
+            throw e;
+        }
+    }
+
+
+    public List findByExample(Company instance) {
+        log.debug("finding Company instance by example");
+        try {
+            List results = getSession()
+                    .createCriteria("org.in.placementv2.model.Company")
+                    .add(Example.create(instance)).list();
+            log.debug("find by example successful, result size: "
+                    + results.size());
+            return results;
+        } catch (RuntimeException re) {
+            log.error("find by example failed", re);
+            throw re;
+        }
+    }
+
+    public List findByProperty(String propertyName, Object value) {
+        log.debug("finding Company instance with property: " + propertyName
+                + ", value: " + value);
+        try {
+            String queryString = "from Company as model where model."
+                    + propertyName + "= ?";
+            Query queryObject = getSession().createQuery(queryString);
+            queryObject.setParameter(0, value);
+            return queryObject.list();
+        } catch (RuntimeException re) {
+            log.error("find by property name failed", re);
+            throw re;
+        }
+    }
+
+    public List findByName(Object name) {
+        return findByProperty(NAME, name);
+    }
+
+    public List findByDescription(Object description) {
+        return findByProperty(DESCRIPTION, description);
+    }
+
+    public List findBySscmarks(Object sscmarks) {
+        return findByProperty(SSCMARKS, sscmarks);
+    }
+
+    public List findByHscmarks(Object hscmarks) {
+        return findByProperty(HSCMARKS, hscmarks);
+    }
+
+    public List findByMcamarks(Object mcamarks) {
+        return findByProperty(MCAMARKS, mcamarks);
+    }
+
+    public List findAll() {
+        log.debug("finding all Company instances");
+        try {
+            String queryString = "from Company";
+            Query queryObject = getSession().createQuery(queryString);
+            return queryObject.list();
+        } catch (RuntimeException re) {
+            log.error("find all failed", re);
+            throw re;
+        }
+    }
+
+    public Company merge(Company detachedInstance) {
+        log.debug("merging Company instance");
+
+        Session session = null;
+        Transaction tx = null;
+        try {
+            session = getSession();
+            tx = session.beginTransaction();
+            Company company = (Company) session.merge(detachedInstance);
+            tx.commit();
+            log.debug("merge successful");
+            return company;
+        } catch (RuntimeException re) {
+            log.error("save failed", re);
+            tx.rollback();
+            throw re;
+        } finally {
+            session.close();
+        }
+    }
+
+    public void attachDirty(Company instance) {
+        log.debug("attaching dirty Company instance");
+        try {
+            getSession().saveOrUpdate(instance);
+            log.debug("attach successful");
+        } catch (RuntimeException re) {
+            log.error("attach failed", re);
+            throw re;
+        }
+    }
+
+    public void attachClean(Company instance) {
+        log.debug("attaching clean Company instance");
+        try {
+            getSession().lock(instance, LockMode.NONE);
+            log.debug("attach successful");
+        } catch (RuntimeException re) {
+            log.error("attach failed", re);
+            throw re;
+        }
+    }
+
+
 }

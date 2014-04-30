@@ -18,6 +18,9 @@
         } else if (obj.equals(JspString.OBJ_STUD)) {
             name_placeholder = JspString.STUDENT_NAME_PLACEHOLDER;
             legend_placeholder = JspString.LEGEND_ADD_STUD;
+        } else if (obj.equals(JspString.OBJ_SKILL)) {
+            name_placeholder = JspString.SKILL_NAME_PLACEHOLDER;
+            legend_placeholder = JspString.LEGEND_ADD_SKILL;
         }
     } else if (action.equals(JspString.ACTION_EDIT)) {
         skill_label = JspString.LABEL_SKILL_REMOVE;
@@ -27,6 +30,9 @@
         } else if (obj.equals(JspString.OBJ_STUD)) {
             name_placeholder = JspString.STUDENT_NAME_PLACEHOLDER;
             legend_placeholder = JspString.LEGEND_EDIT_STUD;
+        } else if (obj.equals(JspString.OBJ_SKILL)) {
+            name_placeholder = JspString.SKILL_NAME_PLACEHOLDER;
+            legend_placeholder = JspString.LEGEND_EDIT_SKILL;
         }
     }
 %>
@@ -40,10 +46,16 @@
                 <input type="text" class="form-control" id="<%= JspString.NAME_FIELD %>"
                        placeholder="<%= name_placeholder %>">
             </div>
+            <% if (!obj.equals(JspString.OBJ_SKILL)) { %>
+
             <div class="col-sm-4">
                 <input type="text" class="form-control" id="<%= JspString.SSC_MARKS_FIELD %>" placeholder="SSC Marks">
             </div>
+
+            <% } %>
         </div>
+        <% if (!obj.equals(JspString.OBJ_SKILL)) { %>
+
         <div class="row form-group">
             <div class="col-sm-4">
                 <input type="text" class="form-control" id="<%= JspString.HSC_MARKS_FIELD %>" placeholder="HSC Marks">
@@ -67,7 +79,7 @@
         <% if (obj.equals(JspString.OBJ_COMP)) { %>
         <div class="row form-group">
             <div class="col-sm-8">
-                <textarea class="form-control" rows="2" id="<%= JspString.COMP_DESCRIPTION %>"
+                <textarea class="form-control" rows="2" id="<%= JspString.DESCRIPTION_FIELD %>"
                           placeholder="Description"></textarea>
             </div>
         </div>
@@ -94,9 +106,10 @@
                 </div>
             </div>
         </div>
+        <% } %>
         <div class="row form-group">
             <div class="col-sm-4">
-                <button type="submit" class="btn btn-success" onclick="saveStudOrComp('<%= obj %>', '<%= action %>');">Save</button>
+                <button type="button" class="btn btn-success" onclick="saveObject('<%= obj %>', '<%= action %>');">Save</button>
             </div>
             <div class="col-sm-4">
                 <button type="reset" class="btn btn-default">Reset</button>
