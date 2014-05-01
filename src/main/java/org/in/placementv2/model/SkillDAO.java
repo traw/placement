@@ -124,7 +124,7 @@ public class SkillDAO extends SkillDao implements SQLDilect, JspString {
             for (Map.Entry<String, Object> entry : propertyIndexMap.entrySet()) {
                 Object o = entry.getValue();
                  if (o instanceof String) {
-                    query.setString(entry.getKey(), (String) o);
+                    query.setString(entry.getKey(), "%"+ o +"%");
                 } else if (o instanceof Boolean) {
                     query.setBoolean(entry.getKey(), (Boolean) o);
                 } else if (o instanceof Long ) {

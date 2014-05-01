@@ -17,7 +17,7 @@
     <div class="container">
         <div class="row row-offcanvas row-offcanvas-left">
             <!-- sidebar -->
-            <div class="col-xs-3 col-sm-2 sidebar-offcanvas " id="sidebar" role="navigation">
+            <div class="col-xs-2 col-sm-2 sidebar-offcanvas " id="sidebar" role="navigation">
                 <div data-spy="affix" data-offset-top="45" data-offset-bottom="90">
                     <ul class="nav nav-tabs" id="sidebar-nav">
                         <li>
@@ -48,7 +48,7 @@
                             <a class="btn btn-small btn-link" name="add" id="nav_<%= JspString.OBJ_COMP %>_<%= JspString.ACTION_ADD %>')"
                                onclick="getOperation('<%= JspString.FORM_ADD_EDIT %>',
                                        '<%= JspString.OBJ_COMP %>', '<%= JspString.ACTION_ADD %>');"
-                               title="Add Compnay">
+                               title="Add Company">
                                 Add Company
                             </a>
                         </li>
@@ -72,7 +72,7 @@
             </div>
 
             <!-- main area -->
-            <div class="col-xs-9 col-sm-9" data-spy="scroll" data-target="#sidebar-nav">
+            <div class="col-xs-10 col-sm-9" data-spy="scroll" data-target="#sidebar-nav">
                 <div name="operationName" id="<%= JspString.TOP_PANEL %>">
                     <%--<c:import url="formsearch.jsp"></c:import>--%>
                 </div>
@@ -91,7 +91,7 @@
 
 
 <c:import url="inc/scripts.jsp"></c:import>
-<c:import url="/validate.jsp"></c:import>
+<%--<c:import url="/validate.jsp"></c:import>--%>
 <c:import url="/inc/commonFunction.jsp"></c:import>
 </body>
 </html>

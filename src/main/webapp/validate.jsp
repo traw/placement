@@ -168,18 +168,18 @@ function buildPrimaryTable(dispNode, obj, act, jsonObject) {
     var title = obj == '<%= JspString.OBJ_STUD %>' ? 'Student'
             : (obj == '<%= JspString.OBJ_COMP %>' ? 'Company' : 'Skill');
     var studTableNod = document.createElement('table');
-    studTableNod.setAttribute('class', 'table table-bordered');
+    studTableNod.setAttribute('class', 'table table-striped custab');
     studTableNod.setAttribute('name', obj + 'Table');
 
     var captionNod = document.createElement('caption');
 
-    var h4Ele = document.createElement('h4');
-    h4Ele.setAttribute('align', 'center');
+    var h3Ele = document.createElement('h3');
+    h3Ele.setAttribute('align', 'center');
     var captionSpanEle = document.createElement('span');
     captionSpanEle.setAttribute('class', 'label label-primary');
     captionSpanEle.innerHTML = title + '<br/>';
-    h4Ele.appendChild(captionSpanEle);
-    captionNod.appendChild(h4Ele);
+    h3Ele.appendChild(captionSpanEle);
+    captionNod.appendChild(h3Ele);
     studTableNod.appendChild(captionNod);
 
     var tHeadEle = document.createElement('thead');
@@ -202,15 +202,12 @@ function buildPrimaryTable(dispNode, obj, act, jsonObject) {
         $(tHeadTrTDEle).append('<strong style="color: #195f91">' + columnNameArray[k] + '</strong>');
         tHeadTrNod.appendChild(tHeadTrTDEle);
     }
-    <!-- Adding Edit Column -->
-    var editCol = document.createElement('td');
-    $(editCol).append('<strong style="color: #195f91">Edit</strong>');
-    tHeadTrNod.appendChild(editCol);
 
     <!-- Adding Edit Column -->
-    var delCol = document.createElement('td');
-    $(delCol).append('<strong style="color: #195f91">Delete</strong>');
-    tHeadTrNod.appendChild(delCol);
+    var actionCol = document.createElement('td');
+    $(actionCol).append('<strong style="color: #195f91">Action</strong>');
+    actionCol.classList.add('text-center');
+    tHeadTrNod.appendChild(actionCol);
 
     <!-- Adding Get sub objects Column -->
     var subObjCol = document.createElement('td');
@@ -250,28 +247,19 @@ function buildPrimaryTable(dispNode, obj, act, jsonObject) {
         }
         /* Edit Button for record */
         var tdEditNod = document.createElement('td');
-        $(tdEditNod).append('<button type="button" class="btn btn-xs btn-danger" ' +
-                'id="delete-stud-btn" data-toggle="modal"' +
-                'onclick="getEditFrom(this,&quot;' + obj + '&quot;, &quot;<%= JspString.ACTION_EDIT %>&quot;)">' +
-                '<i class="glyphicon glyphicon-edit glyphicon-align-center"></i>' +
-                '</button>');
-        trNod.appendChild(tdEditNod);
+        $(tdEditNod).append('<a class="btn btn-info btn-xs" title="Edit"' +
+                'onclick="getEditFrom(this,&quot;' + obj + '&quot;, &quot;<%= JspString.ACTION_EDIT %>&quot;)">'+
+                '<span class="glyphicon glyphicon-pencil"></span></a>' +
+                ' <a class="btn btn-danger btn-xs" title="Delete" ' +
+                'onclick="deleteObject(this,&quot;' + obj + '&quot;, &quot;<%= JspString.ACTION_DEL %>&quot;)">'+
+                '<span class="glyphicon glyphicon-trash"></span></a>');
 
-        /* Delete Button for record */
-        var tdDelNod = document.createElement('td');
-        $(tdDelNod).append('<button type="button" class="btn btn-xs btn-danger" ' +
-                'id="delete-stud-btn" data-toggle="modal" data-target="#confirmDelete"data-title="Delete User" ' +
-                'data-message="Are you sure you want to delete this Student ?" ' +
-                'onclick="deleteObject(this,&quot;' + obj + '&quot;, &quot;<%= JspString.ACTION_DEL %>&quot;)">' +
-                '<i class="glyphicon glyphicon-edit glyphicon-align-center"></i>' +
-                '</button>');
-        trNod.appendChild(tdDelNod);
+        trNod.appendChild(tdEditNod);
 
         /* Get Sub object Button for record */
         var getSubNod = document.createElement('td');
         $(getSubNod).append('<button type="button" class="btn btn-xs btn-danger" ' +
-                'id="delete-stud-btn" data-toggle="modal" data-target="#confirmDelete"data-title="Delete User" ' +
-                'data-message="Are you sure you want to delete this Student ?" ' +
+                'id="delete-stud-btn" ' +
                 'onclick="searchSubObject(&quot;' + row[0] + '&quot;,&quot;<%= JspString.SECONDARY_TABLE %>&quot;,&quot;' + obj + '&quot;, &quot;' + subObj + '&quot;)">' +
                 'Get' +
                 '</button>');
@@ -297,7 +285,7 @@ function buildSecondaryTable(dispNode, obj, act, jsonObject) {
 
     var captionNod = document.createElement('caption');
 
-    var h3Ele = document.createElement('h3');
+    var h4Ele = document.createElement('h4');
     h3Ele.setAttribute('align', 'center');
     var captionSpanEle = document.createElement('span');
     captionSpanEle.setAttribute('class', 'label label-primary');

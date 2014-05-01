@@ -8,9 +8,9 @@ html,body {
     height: auto !important;
     height: 100%;
     /* negative indent footer by its height */
-    margin: 0 auto -120px;
+    margin: 0 auto -20px;
     /* pad bottom by footer height */
-    padding: 0 0 120px;
+    padding: 0 0 20px;
 }
 
 /* set the fixed height of the footer here */
@@ -57,13 +57,13 @@ a {
 #sidebar .affix {
     position:fixed;
     top:55;
-    width:220px;
+    width:170px;
 }
 
 #sidebar .affix-bottom {
     position:fixed;
     top:55;
-    width:220px;
+    width:170px;
 }
 
 #sidebar .nav {
@@ -142,4 +142,16 @@ a {
         border-top-color: #fff;
         border-bottom-color: #fff;
     }
+}
+
+.custab{
+    border: 1px solid #ccc;
+    padding: 5px;
+    margin: 5% 0;
+    box-shadow: 3px 3px 2px #ccc;
+    transition: 0.5s;
+}
+.custab:hover{
+    box-shadow: 3px 3px 0px;
+    transition: 0.5s;
 }

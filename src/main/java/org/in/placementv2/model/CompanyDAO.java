@@ -183,7 +183,7 @@ public class CompanyDAO extends SkillDao implements SQLDilect, JspString {
                 if (o instanceof List) {
                     query.setParameterList(SKILLS, (Collection) entry.getValue());
                 } else if (o instanceof String) {
-                    query.setString(entry.getKey(), (String) o);
+                    query.setString(entry.getKey(), "%" + (String) o + "%");
                 } else if (o instanceof Boolean) {
                     query.setBoolean(entry.getKey(), (Boolean) o);
                 } else if (o instanceof Long) {
